@@ -2,6 +2,8 @@ package cpp.jackcompiler;
 
 public enum TokenType 
 {
+    UNSET,
+    
     KEYWORD,
     SYMBOL,
     IDENTIFIER,

@@ -11,22 +11,32 @@ public class RegexSingleton
     private Pattern stringPattern;
     private Pattern intPattern;
     private Pattern comments;
+    private Pattern whitespace;
 
-    // private constructor to avoid client applications using the constructor
     private RegexSingleton()
     {
-         keywords = Pattern.compile("(class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return)");
-         symbols = Pattern.compile("([{}()\\[\\].,;+-*/&=<|>-])");
-         identifier = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*");
-         stringPattern = Pattern.compile("\"(.)*\"");
-         intPattern = Pattern.compile("\\d+");
-         comments = Pattern.compile("(//.*)|(/\\*([^*]|[\r\n]|(\\*+([^*/]|[\r\n])))*\\*+/)");
+        keywords = Pattern.compile("^\\s*(class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return)");
+        symbols = Pattern.compile("^^\\s*([~{}()\\[\\].,;\\+\\-\\*\\/&=<\\|>-])"); //SYM
+        identifier = Pattern.compile("^\\s*[a-zA-Z_][a-zA-Z0-9_]*"); // Starts with letter
+        stringPattern = Pattern.compile("^\\s*\"(.)*\""); // Quoted
+        intPattern = Pattern.compile("^\\s*\\d+"); //Digit
+        comments = Pattern.compile("(//.*)|(/\\*([^*]|[\r\n]|(\\*+([^*/]|[\r\n])))*\\*+/)");
+        whitespace = Pattern.compile("\\s+");
     }
-
     public static RegexSingleton getInstance() 
     {
         return instance;
     }
+
+    // /**
+    //  * keywords; 0
+    //  * symbols; 1 
+    //  * identifier; 2
+    //  * stringPattern; 3
+    //  * intPattern; 4
+    //  * comments; 5
+    //  * whitespace; 6
+    //  */
 
     public Pattern getComments() {
         return comments;
@@ -46,5 +56,9 @@ public class RegexSingleton
     public Pattern getSymbols() {
         return symbols;
     }
+    public Pattern getWhitespace() {
+        return whitespace;
+    }
 
+    
 }
