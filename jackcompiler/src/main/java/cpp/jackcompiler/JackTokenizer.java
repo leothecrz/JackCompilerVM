@@ -43,7 +43,7 @@ public class JackTokenizer
         re = RegexSingleton.getInstance();
     }
 
-    public void advanced()
+    public void advance()
     {
         if(tokenStack.isEmpty())
         {
