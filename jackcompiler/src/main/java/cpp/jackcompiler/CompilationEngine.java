@@ -11,12 +11,14 @@ public class CompilationEngine
     private JackTokenizer tokenizer;
     private FileWriter writer;
 
+    //In file should be confirm as .jack outisde of engine. outfile should also be assured to not exist.
     public CompilationEngine(File inFile)
     {
         indintationCount = 0;
+        
         tokenizer = new JackTokenizer(inFile);
-
-        File outFile = new File(inFile.getPath().concat("/").concat( inFile.getName() ).concat(".vm"));
+        
+        File outFile = new File( inFile.getPath().concat("/").concat( inFile.getName() ).concat(".vm") ); // Filepath[.jack]->Filepath[.vm]
         
         try {
             outFile.createNewFile();
@@ -84,7 +86,28 @@ public class CompilationEngine
 
     public void compileExpression()
     {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ".repeat(indintationCount));
+        sb.append("<Expression>");
+        indintationCount++;
 
+        compileTerm();
+        if(!tokenizer.hasMoreTokens())
+            return;
+
+        tokenizer.advance();
+        while((tokenizer.tokenType() == TokenType.SYMBOL) && isOP(tokenizer.symbol()))
+        {
+            writeSymbol();
+            tokenizer.advance();
+            compileTerm();
+        }
+
+        sb = new StringBuilder();
+        indintationCount--;
+        sb.append(" ".repeat(indintationCount));
+        sb.append("</Expression>");
+        writeLine(sb.toString());
     }
 
     public void compileTerm()
@@ -93,8 +116,8 @@ public class CompilationEngine
         sb.append(" ".repeat(indintationCount));
         sb.append("<Term>");
         writeLine(sb.toString());
-        indintationCount++;
 
+        indintationCount++;
         switch (tokenizer.tokenType()) {
             case INT_CONST:
                 writeIntegerConst();
@@ -131,10 +154,15 @@ public class CompilationEngine
                     
                     case '-':
                     case '~':
-                    
+                    writeSymbol();
+                    if(!tokenizer.hasMoreTokens())
+                    {
+
+                    }
+                    tokenizer.advance();
+                    compileTerm();
+                    break;
                 }
-
-
                 break;
         
             default:
@@ -145,7 +173,24 @@ public class CompilationEngine
         sb.append(" ".repeat(indintationCount));
         sb.append("</Term>");
         writeLine(sb.toString());
+    }
 
+    private boolean isOP(char c)
+    {
+        switch (c) {
+            case '+':
+            case '-':
+            case '*':
+            case '/':
+            case '&':
+            case '|':
+            case '<':
+            case '>':
+            case '=':
+                return true;
+            default:
+                return false;
+        }
     }
 
     private void TermIdentifierChecks()
@@ -177,17 +222,56 @@ public class CompilationEngine
                 break;
 
             case '.':
+                writeSymbol();
+                if(!tokenizer.hasMoreTokens())
+                {
+
+                }
+                tokenizer.advance();
+                writeIdentifier();
+                
+                tokenizer.advance();
+                writeSymbol();
+
+                tokenizer.advance();
+                compileExpressionList();
+
+                tokenizer.advance();
+                writeSymbol();
                 break;
         }
 
     }
 
+    private void compileExpressionList()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ".repeat(indintationCount));
+        sb.append("<ExpressionList>");
+        indintationCount++;
+
+        if(tokenizer.tokenType() == TokenType.SYMBOL && tokenizer.symbol() == '(')
+        {
+            compileExpression();
+
+        }
+
+
+        sb = new StringBuilder();
+        indintationCount--;
+        sb.append(" ".repeat(indintationCount));
+        sb.append("</ExpressionList>");
+        writeLine(sb.toString());
+    }
 
     private void writeKeyword()
     {
         StringBuilder sb = new StringBuilder();
+        sb.append(" ".repeat(indintationCount));
         sb.append("<KeyWord>");
+
         sb.append(tokenizer.keyword());
+
         sb.append("</KeyWord>\n");
         writeLine(sb.toString());
     }
@@ -195,8 +279,11 @@ public class CompilationEngine
     private void writeSymbol()
     {
         StringBuilder sb = new StringBuilder();
+        sb.append(" ".repeat(indintationCount));
         sb.append("<Symbol> ");
+
         sb.append(tokenizer.symbol());
+
         sb.append(" </Symbol>\n");
         writeLine(sb.toString());
     }
@@ -204,8 +291,11 @@ public class CompilationEngine
     private void writeIdentifier()
     {
         StringBuilder sb = new StringBuilder();
+        sb.append(" ".repeat(indintationCount));
         sb.append("<Identifier> ");
+
         sb.append(tokenizer.keyword());
+
         sb.append(" </Identifier>\n");
         writeLine(sb.toString());
     }
@@ -214,7 +304,9 @@ public class CompilationEngine
     {
         StringBuilder sb = new StringBuilder();
         sb.append("<StringConst> ");
+
         sb.append(tokenizer.keyword());
+
         sb.append(" </StringConst>\n");
         writeLine(sb.toString());
     }
@@ -224,7 +316,9 @@ public class CompilationEngine
         StringBuilder sb = new StringBuilder();
         sb.append(" ".repeat(indintationCount));
         sb.append("<IntegerConst> ");
+
         sb.append( String.valueOf( tokenizer.intVal() ) );
+
         sb.append(" </IntegerConst>\n");
         writeLine(sb.toString());
     }
