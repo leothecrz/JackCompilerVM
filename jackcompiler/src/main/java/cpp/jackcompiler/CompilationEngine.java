@@ -32,6 +32,84 @@ public class CompilationEngine
     public void compileClass()
     {
 
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ".repeat(indintationCount));
+        sb.append("<Class>");
+        indintationCount++;
+
+        if(!tokenizer.ifTokensAdvance())
+        {
+            throw new RuntimeException("No Tokens For Class");
+        }
+
+        if(tokenizer.tokenType() != TokenType.KEYWORD)
+        {
+        }
+        System.out.println(tokenizer.keyword());
+        if(tokenizer.keyword() != "class" )
+        {
+        }
+
+        if(!tokenizer.ifTokensAdvance())
+        {
+        }
+        if(tokenizer.tokenType() != TokenType.IDENTIFIER)
+        {
+        }
+
+        if(!tokenizer.ifTokensAdvance())
+        {
+        }
+        if(tokenizer.tokenType() != TokenType.SYMBOL)
+        {
+        }
+        if(tokenizer.symbol() != '{');
+
+        if(!tokenizer.ifTokensAdvance())
+        {
+            //
+        }
+
+        //Class Var Declaration.
+        while(tokenizer.tokenType() == TokenType.KEYWORD)
+        {
+            
+            if(tokenizer.keyword() != "static" && tokenizer.keyword() != "static")
+            {
+                break;
+            }
+            writeKeyword();
+
+            if(!tokenizer.ifTokensAdvance())
+            {
+            }
+
+            if(tokenizer.tokenType() != TokenType.KEYWORD)
+            {}
+            
+            if(tokenizer.tokenType() != TokenType.IDENTIFIER)
+            {}
+
+            
+
+        }
+
+        //Class Sub Routine Declarations.
+
+        if(!tokenizer.ifTokensAdvance())
+        {
+        }
+        if(tokenizer.tokenType() != TokenType.SYMBOL)
+        {
+        }
+        if(tokenizer.symbol() != '}');        
+
+
+        sb = new StringBuilder();
+        indintationCount--;
+        sb.append(" ".repeat(indintationCount));
+        sb.append("</Class>");
+        writeLine(sb.toString());
     }
 
     public void compileClassVarDec()
@@ -138,31 +216,7 @@ public class CompilationEngine
                 break;
 
             case SYMBOL:
-
-                switch (tokenizer.symbol()) 
-                {
-                    case '(':
-                        writeSymbol();
-                        if(!tokenizer.hasMoreTokens())
-                        {
-
-                        }
-                        compileExpression();
-                        tokenizer.advance();
-                        writeSymbol();
-                        break;
-                    
-                    case '-':
-                    case '~':
-                    writeSymbol();
-                    if(!tokenizer.hasMoreTokens())
-                    {
-
-                    }
-                    tokenizer.advance();
-                    compileTerm();
-                    break;
-                }
+                TermSymbolChecks();
                 break;
         
             default:
@@ -193,24 +247,49 @@ public class CompilationEngine
         }
     }
 
+    private void TermSymbolChecks()
+    {
+        switch (tokenizer.symbol()) {
+            //Expresiion Term
+            case '(':
+                writeSymbol();
+                compileExpression();
+                if(!tokenizer.ifTokensAdvance())
+                {
+                    //ERROR
+                }
+                if(tokenizer.symbol() == ')')
+                    writeSymbol();
+                else
+                    //error
+                break;
+            //Unary Ops
+            case '-':
+            case '~':
+                writeSymbol();
+                if(!tokenizer.ifTokensAdvance())
+                {
+                    //ERROR
+                }
+                compileTerm();
+                break;
+        
+            default:
+                
+            throw new RuntimeException("Symbol Not Applicable To Term");
+        }
+    }
+
     private void TermIdentifierChecks()
     {
         tokenizer.advance();
         if(tokenizer.tokenType() != TokenType.SYMBOL)
+        {
             return;
-
+        }
+            
         switch (tokenizer.symbol()) {
-            case '[':
-                writeSymbol();
-                if(!tokenizer.hasMoreTokens())
-                {
-                    System.err.println("TERM ARRAY ACCESS FAILURE");
-                }
-                compileExpression();
-                tokenizer.advance();
-                writeSymbol();
-                break;
-            case '(':   
+            case '[': // VARNAME[expressions]
                 writeSymbol();
                 if(!tokenizer.hasMoreTokens())
                 {
@@ -221,7 +300,18 @@ public class CompilationEngine
                 writeSymbol();
                 break;
 
-            case '.':
+            case '(': //Subroutine Call
+                writeSymbol();
+                if(!tokenizer.hasMoreTokens())
+                {
+                    //missing expressions and ')'
+                }
+                compileExpressionList();
+                tokenizer.advance();
+                writeSymbol();
+                break;
+
+            case '.': //Subroutine Call
                 writeSymbol();
                 if(!tokenizer.hasMoreTokens())
                 {
@@ -250,9 +340,8 @@ public class CompilationEngine
         sb.append("<ExpressionList>");
         indintationCount++;
 
-        if(tokenizer.tokenType() == TokenType.SYMBOL && tokenizer.symbol() == '(')
+        if(tokenizer.tokenType() == TokenType.SYMBOL && tokenizer.symbol() != '(')
         {
-            compileExpression();
 
         }
 

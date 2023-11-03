@@ -119,6 +119,9 @@ public class JackTokenizer
             { 
                 tokenizeString(activeline);
                 lineNumber++;
+                if(tokenStack.isEmpty())
+                    return hasMoreTokens();
+                    
                 return true;
             }
         } 

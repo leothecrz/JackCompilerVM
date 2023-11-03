@@ -17,7 +17,7 @@ public class RegexSingleton
     {
         keywords = Pattern.compile("^\\s*(class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return)");
         symbols = Pattern.compile("^^\\s*([~{}()\\[\\].,;\\+\\-\\*\\/&=<\\|>-])"); //SYM
-        identifier = Pattern.compile("^\\s*[a-zA-Z_][a-zA-Z0-9_]*"); // Starts with letter
+        identifier = Pattern.compile("^\\s*([a-zA-Z_][a-zA-Z0-9_]*)"); // Starts with letter
         stringPattern = Pattern.compile("^\\s*\"(.)*\""); // Quoted
         intPattern = Pattern.compile("^\\s*\\d+"); //Digit
         comments = Pattern.compile("(//.*)|(/\\*([^*]|[\r\n]|(\\*+([^*/]|[\r\n])))*\\*+/)");
