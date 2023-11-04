@@ -13,7 +13,6 @@ public class JackAnalyzer
         while (tokenizer.hasMoreTokens()) 
         {
             tokenizer.advance();
-            tokenizer.printState();
         }
     }
 

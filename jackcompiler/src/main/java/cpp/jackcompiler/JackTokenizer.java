@@ -61,7 +61,6 @@ public class JackTokenizer
 
     public void advance()
     {
-        
         StackToken tkn = tokenStack.poll();
 
         switch (tkn.getType()) {
@@ -100,14 +99,6 @@ public class JackTokenizer
             
     }
 
-    public void printState()
-    {
-        System.out.println(this.activeKeyword);
-        System.out.println(this.activeInt);
-        System.out.println(this.activeSym);
-        System.out.println(this.tokenType());
-    }
-
     public boolean hasMoreTokens()
     {
         if(!tokenStack.isEmpty())
@@ -127,8 +118,9 @@ public class JackTokenizer
         } 
         catch (IOException e) 
         {
-            System.err.println("Line Could Not Be READ.");
+            System.err.println("Reader failed to read next line from file.");
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return false;
@@ -209,29 +201,49 @@ public class JackTokenizer
 
     public String keyword()
     {
+        if(this.activeTokenType != TokenType.KEYWORD)
+            printError("KEYWORD");
+
         return activeKeyword;
     }
 
     public char symbol()
     {
+        if(this.activeTokenType != TokenType.SYMBOL)
+            printError("SYMBOL");
         return activeSym;
     }
 
     public String identifier()
     {
+        if(this.activeTokenType != TokenType.IDENTIFIER)
+            printError("IDENTIFIER");
         return activeKeyword;
     }
 
     public int intVal()
     {
+        if(this.activeTokenType != TokenType.INT_CONST)
+            printError("INTEGER CONSTANT");
         return activeInt;
     }
 
     public String stringVal()
     {
+        if(this.activeTokenType != TokenType.STRING_CONST)
+            printError("STRING CONSTANT");
         return activeKeyword;
     }
     
+    private void printError(String source)
+    {
+        System.err.println("Attempted to get value for " + source);
+        System.err.println("While state is: ");
+        System.err.println("Line Number: " + String.valueOf(lineNumber));
+        System.err.println("TokenType: " + this.tokenType());
+        System.err.println(activeline);
+        throw new RuntimeException("Compilation Failure");
+    }
     private class StackToken
     {
         private TokenType type;
