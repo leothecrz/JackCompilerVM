@@ -135,12 +135,18 @@ public class JackTokenizer
             //Remove whitespace
             mat = re.getWhitespace().matcher(copy);
             if(mat.find() && mat.start()==0)
+            {
                 copy = mat.replaceFirst("");
+                continue;
+            }
             
             //Remove comments
             mat = re.getComments().matcher(copy);
             if(mat.find() && mat.start()==0)
+            {
                 copy = mat.replaceFirst("");
+                continue;
+            }
             
             //Extract Symbol Token
             mat = re.getSymbols().matcher(copy);

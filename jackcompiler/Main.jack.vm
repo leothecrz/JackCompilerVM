@@ -1,0 +1,89 @@
+<Class>
+ <KeyWord>class</KeyWord>
+
+ <Identifier> Main </Identifier>
+
+ <Symbol> { </Symbol>
+
+ <Subroutine>
+  <KeyWord>function</KeyWord>
+
+  <KeyWord>void</KeyWord>
+
+  <Identifier> main </Identifier>
+
+  <Symbol> ( </Symbol>
+
+  <Parameter List>
+   <Symbol> ) </Symbol>
+
+   <Symbol> { </Symbol>
+
+   <VarDec>
+    <KeyWord>var</KeyWord>
+
+    <Identifier> Array </Identifier>
+
+    <Identifier> a </Identifier>
+
+    <Symbol> ; </Symbol>
+
+    <KeyWord>var</KeyWord>
+
+    <KeyWord>int</KeyWord>
+
+    <Identifier> length </Identifier>
+
+    <Symbol> ; </Symbol>
+
+    <KeyWord>var</KeyWord>
+
+    <KeyWord>int</KeyWord>
+
+    <Identifier> i </Identifier>
+
+    <Symbol> , </Symbol>
+
+    <Identifier> sum </Identifier>
+
+    <Symbol> ; </Symbol>
+
+   </VarDec>
+   <Statements>
+    <LetStatement>
+     <KeyWord>let</KeyWord>
+
+     <Identifier> length </Identifier>
+
+     <Symbol> = </Symbol>
+
+     <Expression>
+      <Term>
+       <Identifier> Keyboard </Identifier>
+
+       <Identifier> readInt </Identifier>
+
+       <Symbol> ( </Symbol>
+
+       <ExpressionList>
+        <Expression>
+         <Term>
+<StringConst> "HOW MANY NUMBERS? " </StringConst>
+
+         </Term>
+        </Expression>
+       </ExpressionList>
+       <Symbol> ) </Symbol>
+
+      </Term>
+     </Expression>
+     <Symbol> ; </Symbol>
+
+    </LetStatement>
+   </Statements>
+   <Symbol> ; </Symbol>
+
+  </Subroutine>
+  <Symbol> ; </Symbol>
+
+ </Class>
