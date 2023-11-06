@@ -7,14 +7,14 @@ import java.io.IOException;
 public class CompilationEngine 
 {
 
-    private int indintationCount;
+    private int indentationCount;
     private JackTokenizer tokenizer;
     private FileWriter writer;
 
     //In file should be confirm as .jack outisde of engine. outfile should also be assured to not exist.
     public CompilationEngine(File inFile)
     {
-        indintationCount = 0;
+        indentationCount = 0;
         
         tokenizer = new JackTokenizer(inFile);
         
@@ -40,11 +40,7 @@ public class CompilationEngine
 
     public void compileClass()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
-        sb.append("<Class>");
-        writeLine(sb.toString());
-        indintationCount++;
+        openTagAndIncrementIndent("<Class>");
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS.");
@@ -84,20 +80,12 @@ public class CompilationEngine
             throw new RuntimeException("Missing CLASS end bracket.");
         writeSymbol(); // }
 
-        sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
-        sb.append("</Class>");
-        writeLine(sb.toString());
+        closeTagAndDecrementIndent("</Class>");
     }
 
     public void compileClassVarDec()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
-        sb.append("<ClassVarDec>");
-        indintationCount++;
-        writeLine(sb.toString());
+        openTagAndIncrementIndent("<ClassVarDec>");
 
         writeKeyword(); // static or field
 
@@ -151,20 +139,12 @@ public class CompilationEngine
         if(!tokenizer.ifTokensAdvance())
                 throw new RuntimeException("No more tokens for CLASS from (CVD)");
 
-        sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
-        sb.append("</ClassVarDec>");
-        writeLine(sb.toString());
+        closeTagAndDecrementIndent("</ClassVarDec>");
     }
 
     public void compileSubroutine()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
-        sb.append("<Subroutine>");
-        indintationCount++;
-        writeLine(sb.toString());
+        openTagAndIncrementIndent("<Subroutine>");
 
         writeKeyword(); // Constructor Function Method
 
@@ -221,31 +201,18 @@ public class CompilationEngine
             throw new RuntimeException("SUB ROUTINE Closing parenthesis missing.");
         writeSymbol(); // }
         
-        sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
-        sb.append("</Subroutine>");
-        writeLine(sb.toString());
+        closeTagAndDecrementIndent("</Subroutine>");
     }
 
     public void compileParameterList()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
-        sb.append("<Parameter List>");
-        indintationCount++;
-        writeLine(sb.toString());
+        openTagAndIncrementIndent("<Parameter List>");
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for ParamList.");
         if(tokenizer.tokenType() == TokenType.SYMBOL)
         {
-            sb = new StringBuilder();
-            indintationCount--;
-            sb.append("\t".repeat(indintationCount));
-            sb.append("</Parameter List>");
-            writeLine(sb.toString());
-            return; // NO PARAMS
+            closeTagAndDecrementIndent("</Parameter List>");
         }
             
 
@@ -305,20 +272,12 @@ public class CompilationEngine
                 break;
         }
 
-        sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
-        sb.append("</Parameter List>");
-        writeLine(sb.toString());
+        closeTagAndDecrementIndent("</Parameter List>");
     }
 
     public void compileVarDec()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
-        sb.append("<VarDec>");
-        indintationCount++;
-        writeLine(sb.toString());
+        openTagAndIncrementIndent("<VarDec>");
 
         while (tokenizer.keyword().equals("var")) //varDec*
         {
@@ -378,20 +337,12 @@ public class CompilationEngine
                 break;    
         }
 
-        sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
-        sb.append("</VarDec>");
-        writeLine(sb.toString());
+        closeTagAndDecrementIndent("</VarDec>");
     }
 
     public void compileStatements()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
-        sb.append("<Statements>");
-        indintationCount++;
-        writeLine(sb.toString());
+        openTagAndIncrementIndent("<Statements>");
 
         while (tokenizer.tokenType() == TokenType.KEYWORD) 
         {
@@ -420,20 +371,12 @@ public class CompilationEngine
                 throw new RuntimeException("No more tokens for STATEMENTS.");
         }
 
-        sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
-        sb.append("</Statements>");
-        writeLine(sb.toString());
+        closeTagAndDecrementIndent("</Statements>");
     }
 
     public void compileDo()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
-        sb.append("<DoStatement>");
-        indintationCount++;
-        writeLine(sb.toString());
+        openTagAndIncrementIndent("<DoStatement>");
 
         writeKeyword(); // Do
 
@@ -447,20 +390,12 @@ public class CompilationEngine
             throw new RuntimeException("do statement closer missing.");
         writeSymbol(); // ;
 
-        sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
-        sb.append("</DoStatement>");
-        writeLine(sb.toString());
+        closeTagAndDecrementIndent("</DoStatement>");
     }
 
     public void compileLet()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
-        sb.append("<LetStatement>");
-        indintationCount++;
-        writeLine(sb.toString());
+        openTagAndIncrementIndent("<LetStatement>");
 
         writeKeyword(); // Let
 
@@ -505,20 +440,12 @@ public class CompilationEngine
             throw new RuntimeException("let statement missing closer. ';' missing. ");
         writeSymbol(); // ;
 
-        sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
-        sb.append("</LetStatement>");
-        writeLine(sb.toString());
+        closeTagAndDecrementIndent("</LetStatement>");
     }
 
     public void compileWhile()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
-        sb.append("<LetStatement>");
-        indintationCount++;
-        writeLine(sb.toString());
+        openTagAndIncrementIndent("<WhileStatement>");
 
         writeKeyword(); // While
 
@@ -554,19 +481,15 @@ public class CompilationEngine
             throw new RuntimeException("while statement missing body brace");
         writeSymbol(); // }
 
-        sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
-        sb.append("</LetStatement>");
-        writeLine(sb.toString());
+        closeTagAndDecrementIndent("</WhileStatement>");
     }
 
     public void compileReturn()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
+        sb.append("\t".repeat(indentationCount));
         sb.append("<LetStatement>");
-        indintationCount++;
+        indentationCount++;
         writeLine(sb.toString());
 
         writeKeyword(); // Return
@@ -586,8 +509,8 @@ public class CompilationEngine
             throw new RuntimeException("No more tokens for RETURN_STATEMENT.");
 
         sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
+        indentationCount--;
+        sb.append("\t".repeat(indentationCount));
         sb.append("</LetStatement>");
         writeLine(sb.toString());
     }
@@ -595,9 +518,9 @@ public class CompilationEngine
     public void compileIf()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
+        sb.append("\t".repeat(indentationCount));
         sb.append("<LetStatement>");
-        indintationCount++;
+        indentationCount++;
         writeLine(sb.toString());
 
         writeKeyword(); // IF
@@ -656,8 +579,8 @@ public class CompilationEngine
         }
 
         sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
+        indentationCount--;
+        sb.append("\t".repeat(indentationCount));
         sb.append("</LetStatement>");
         writeLine(sb.toString());
     }
@@ -665,9 +588,9 @@ public class CompilationEngine
     private void compileSubroutineCall()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
+        sb.append("\t".repeat(indentationCount));
         sb.append("<SubRoutineCall>");
-        indintationCount++;
+        indentationCount++;
         writeLine(sb.toString());
         
         writeIdentifier(); //Name
@@ -703,19 +626,15 @@ public class CompilationEngine
                 throw new RuntimeException("No more tokens for SUBROUTINECALL_STATEMENT.");
 
         sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
+        indentationCount--;
+        sb.append("\t".repeat(indentationCount));
         sb.append("</SubRoutineCall>");
         writeLine(sb.toString());
     }
 
     public void compileExpression()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
-        sb.append("<Expression>");
-        indintationCount++;
-        writeLine(sb.toString());
+        openTagAndIncrementIndent("<Expression>");
 
         compileTerm();
 
@@ -731,20 +650,12 @@ public class CompilationEngine
             compileTerm();
         }
         
-        sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
-        sb.append("</Expression>");
-        writeLine(sb.toString());
+        closeTagAndDecrementIndent("</Expression>");
     }
 
     public void compileTerm()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
-        sb.append("<Term>");
-        writeLine(sb.toString());
-        indintationCount++;
+        openTagAndIncrementIndent("</Term>");
 
         switch (tokenizer.tokenType()) 
         {
@@ -775,11 +686,8 @@ public class CompilationEngine
                 throw new RuntimeException("not a term token");
         }
 
-        sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
-        sb.append("</Term>");
-        writeLine(sb.toString());
+        closeTagAndDecrementIndent("</Term>");
+
     }
 
     private void TermSymbolChecks()
@@ -899,11 +807,7 @@ public class CompilationEngine
 
     private void compileExpressionList()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
-        sb.append("<ExpressionList>");
-        indintationCount++;
-        writeLine(sb.toString());
+        openTagAndIncrementIndent("</ExpressionList>");
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for EXPRESSION_LIST.");
@@ -929,18 +833,14 @@ public class CompilationEngine
                         break;
                 }
         }
-            
-        sb = new StringBuilder();
-        indintationCount--;
-        sb.append("\t".repeat(indintationCount));
-        sb.append("</ExpressionList>");
-        writeLine(sb.toString());
+        
+        closeTagAndDecrementIndent("</ExpressionList>");
     }
 
     private void writeKeyword()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
+        sb.append("\t".repeat(indentationCount));
         sb.append("<KeyWord>");
 
         sb.append(tokenizer.keyword());
@@ -952,7 +852,7 @@ public class CompilationEngine
     private void writeSymbol()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
+        sb.append("\t".repeat(indentationCount));
         sb.append("<Symbol> ");
 
         sb.append(tokenizer.symbol());
@@ -964,7 +864,7 @@ public class CompilationEngine
     private void writeIdentifier()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
+        sb.append("\t".repeat(indentationCount));
         sb.append("<Identifier> ");
 
         sb.append(tokenizer.identifier());
@@ -976,7 +876,7 @@ public class CompilationEngine
     private void writeStringConst()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
+        sb.append("\t".repeat(indentationCount));
         sb.append("<StringConst> ");
 
         sb.append(tokenizer.stringVal());
@@ -988,7 +888,7 @@ public class CompilationEngine
     private void writeIntegerConst()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("\t".repeat(indintationCount));
+        sb.append("\t".repeat(indentationCount));
         sb.append("<IntegerConst> ");
 
         sb.append( String.valueOf( tokenizer.intVal() ) );
@@ -1005,6 +905,24 @@ public class CompilationEngine
             e.printStackTrace();
             throw new RuntimeException("Failed To write to file");
         }
+    }
+
+    private void openTagAndIncrementIndent(String tag)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\t".repeat(indentationCount));
+        sb.append(tag);
+        writeLine(sb.toString());
+        indentationCount++;
+    }
+
+    private void closeTagAndDecrementIndent(String tag)
+    {
+        StringBuilder sb = new StringBuilder();
+        indentationCount--;
+        sb.append("\t".repeat(indentationCount));
+        sb.append(tag);
+        writeLine(sb.toString());
     }
 
     
