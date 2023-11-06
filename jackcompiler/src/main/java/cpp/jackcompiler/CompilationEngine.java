@@ -913,6 +913,7 @@ public class CompilationEngine
         StringBuilder sb = new StringBuilder();
         sb.append("\t".repeat(indentationCount));
         sb.append(tag);
+        sb.append("\n");
         writeLine(sb.toString());
         indentationCount++;
     }
@@ -923,6 +924,7 @@ public class CompilationEngine
         indentationCount--;
         sb.append("\t".repeat(indentationCount));
         sb.append(tag);
+        sb.append("\n");
         writeLine(sb.toString());
     }
 

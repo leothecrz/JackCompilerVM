@@ -1,4 +1,5 @@
 <Class>
+
 	<KeyWord>class</KeyWord>
 
 	<Identifier> Main </Identifier>
@@ -6,6 +7,7 @@
 	<Symbol> { </Symbol>
 
 	<Subroutine>
+
 		<KeyWord>function</KeyWord>
 
 		<KeyWord>void</KeyWord>
@@ -15,12 +17,15 @@
 		<Symbol> ( </Symbol>
 
 		<Parameter List>
+
 		</Parameter List>
+
 		<Symbol> ) </Symbol>
 
 		<Symbol> { </Symbol>
 
 		<VarDec>
+
 			<KeyWord>var</KeyWord>
 
 			<Identifier> Array </Identifier>
@@ -50,8 +55,11 @@
 			<Symbol> ; </Symbol>
 
 		</VarDec>
+
 		<Statements>
+
 			<LetStatement>
+
 				<KeyWord>let</KeyWord>
 
 				<Identifier> length </Identifier>
@@ -59,7 +67,9 @@
 				<Symbol> = </Symbol>
 
 				<Expression>
+
 					</Term>
+
 						<Identifier> Keyboard </Identifier>
 
 						<Symbol> . </Symbol>
@@ -69,21 +79,31 @@
 						<Symbol> ( </Symbol>
 
 						</ExpressionList>
+
 							<Expression>
+
 								</Term>
+
 									<StringConst> "HOW MANY NUMBERS? " </StringConst>
 
 								</Term>
+
 							</Expression>
+
 						</ExpressionList>
+
 						<Symbol> ) </Symbol>
 
 					</Term>
+
 				</Expression>
+
 				<Symbol> ; </Symbol>
 
 			</LetStatement>
+
 			<LetStatement>
+
 				<KeyWord>let</KeyWord>
 
 				<Identifier> a </Identifier>
@@ -91,7 +111,9 @@
 				<Symbol> = </Symbol>
 
 				<Expression>
+
 					</Term>
+
 						<Identifier> Array </Identifier>
 
 						<Symbol> . </Symbol>
@@ -101,21 +123,31 @@
 						<Symbol> ( </Symbol>
 
 						</ExpressionList>
+
 							<Expression>
+
 								</Term>
+
 									<Identifier> length </Identifier>
 
 								</Term>
+
 							</Expression>
+
 						</ExpressionList>
+
 						<Symbol> ) </Symbol>
 
 					</Term>
+
 				</Expression>
+
 				<Symbol> ; </Symbol>
 
 			</LetStatement>
+
 			<LetStatement>
+
 				<KeyWord>let</KeyWord>
 
 				<Identifier> i </Identifier>
@@ -123,37 +155,51 @@
 				<Symbol> = </Symbol>
 
 				<Expression>
+
 					</Term>
+
 						<IntegerConst> 0 </IntegerConst>
 
 					</Term>
+
 				</Expression>
+
 				<Symbol> ; </Symbol>
 
 			</LetStatement>
+
 			<WhileStatement>
+
 				<KeyWord>while</KeyWord>
 
 				<Symbol> ( </Symbol>
 
 				<Expression>
+
 					</Term>
+
 						<Identifier> i </Identifier>
 
 					</Term>
+
 					<Symbol> < </Symbol>
 
 					</Term>
+
 						<Identifier> length </Identifier>
 
 					</Term>
+
 				</Expression>
+
 				<Symbol> ) </Symbol>
 
 				<Symbol> { </Symbol>
 
 				<Statements>
+
 					<LetStatement>
+
 						<KeyWord>let</KeyWord>
 
 						<Identifier> a </Identifier>
@@ -161,17 +207,23 @@
 						<Symbol> [ </Symbol>
 
 						<Expression>
+
 							</Term>
+
 								<Identifier> i </Identifier>
 
 							</Term>
+
 						</Expression>
+
 						<Symbol> ] </Symbol>
 
 						<Symbol> = </Symbol>
 
 						<Expression>
+
 							</Term>
+
 								<Identifier> Keyboard </Identifier>
 
 								<Symbol> . </Symbol>
@@ -181,21 +233,31 @@
 								<Symbol> ( </Symbol>
 
 								</ExpressionList>
+
 									<Expression>
+
 										</Term>
+
 											<StringConst> "ENTER THE NEXT NUMBER: " </StringConst>
 
 										</Term>
+
 									</Expression>
+
 								</ExpressionList>
+
 								<Symbol> ) </Symbol>
 
 							</Term>
+
 						</Expression>
+
 						<Symbol> ; </Symbol>
 
 					</LetStatement>
+
 					<LetStatement>
+
 						<KeyWord>let</KeyWord>
 
 						<Identifier> i </Identifier>
@@ -203,25 +265,35 @@
 						<Symbol> = </Symbol>
 
 						<Expression>
+
 							</Term>
+
 								<Identifier> i </Identifier>
 
 							</Term>
+
 							<Symbol> + </Symbol>
 
 							</Term>
+
 								<IntegerConst> 1 </IntegerConst>
 
 							</Term>
+
 						</Expression>
+
 						<Symbol> ; </Symbol>
 
 					</LetStatement>
+
 				</Statements>
+
 				<Symbol> } </Symbol>
 
 			</WhileStatement>
+
 			<LetStatement>
+
 				<KeyWord>let</KeyWord>
 
 				<Identifier> i </Identifier>
@@ -229,15 +301,21 @@
 				<Symbol> = </Symbol>
 
 				<Expression>
+
 					</Term>
+
 						<IntegerConst> 0 </IntegerConst>
 
 					</Term>
+
 				</Expression>
+
 				<Symbol> ; </Symbol>
 
 			</LetStatement>
+
 			<LetStatement>
+
 				<KeyWord>let</KeyWord>
 
 				<Identifier> sum </Identifier>
@@ -245,37 +323,51 @@
 				<Symbol> = </Symbol>
 
 				<Expression>
+
 					</Term>
+
 						<IntegerConst> 0 </IntegerConst>
 
 					</Term>
+
 				</Expression>
+
 				<Symbol> ; </Symbol>
 
 			</LetStatement>
+
 			<WhileStatement>
+
 				<KeyWord>while</KeyWord>
 
 				<Symbol> ( </Symbol>
 
 				<Expression>
+
 					</Term>
+
 						<Identifier> i </Identifier>
 
 					</Term>
+
 					<Symbol> < </Symbol>
 
 					</Term>
+
 						<Identifier> length </Identifier>
 
 					</Term>
+
 				</Expression>
+
 				<Symbol> ) </Symbol>
 
 				<Symbol> { </Symbol>
 
 				<Statements>
+
 					<LetStatement>
+
 						<KeyWord>let</KeyWord>
 
 						<Identifier> sum </Identifier>
@@ -283,31 +375,43 @@
 						<Symbol> = </Symbol>
 
 						<Expression>
+
 							</Term>
+
 								<Identifier> sum </Identifier>
 
 							</Term>
+
 							<Symbol> + </Symbol>
 
 							</Term>
+
 								<Identifier> a </Identifier>
 
 								<Symbol> [ </Symbol>
 
 								<Expression>
+
 									</Term>
+
 										<Identifier> i </Identifier>
 
 									</Term>
+
 								</Expression>
+
 								<Symbol> ] </Symbol>
 
 							</Term>
+
 						</Expression>
+
 						<Symbol> ; </Symbol>
 
 					</LetStatement>
+
 					<LetStatement>
+
 						<KeyWord>let</KeyWord>
 
 						<Identifier> i </Identifier>
@@ -315,25 +419,35 @@
 						<Symbol> = </Symbol>
 
 						<Expression>
+
 							</Term>
+
 								<Identifier> i </Identifier>
 
 							</Term>
+
 							<Symbol> + </Symbol>
 
 							</Term>
+
 								<IntegerConst> 1 </IntegerConst>
 
 							</Term>
+
 						</Expression>
+
 						<Symbol> ; </Symbol>
 
 					</LetStatement>
+
 				</Statements>
+
 				<Symbol> } </Symbol>
 
 			</WhileStatement>
+
 			<DoStatement>
+
 				<KeyWord>do</KeyWord>
 
 				<SubRoutineCall>
@@ -346,20 +460,28 @@
 					<Symbol> ( </Symbol>
 
 					</ExpressionList>
+
 						<Expression>
+
 							</Term>
+
 								<StringConst> "THE AVERAGE IS: " </StringConst>
 
 							</Term>
+
 						</Expression>
+
 					</ExpressionList>
+
 					<Symbol> ) </Symbol>
 
 				</SubRoutineCall>
 				<Symbol> ; </Symbol>
 
 			</DoStatement>
+
 			<DoStatement>
+
 				<KeyWord>do</KeyWord>
 
 				<SubRoutineCall>
@@ -372,26 +494,36 @@
 					<Symbol> ( </Symbol>
 
 					</ExpressionList>
+
 						<Expression>
+
 							</Term>
+
 								<Identifier> sum </Identifier>
 
 							</Term>
+
 							<Symbol> / </Symbol>
 
 							</Term>
+
 								<Identifier> length </Identifier>
 
 							</Term>
+
 						</Expression>
+
 					</ExpressionList>
+
 					<Symbol> ) </Symbol>
 
 				</SubRoutineCall>
 				<Symbol> ; </Symbol>
 
 			</DoStatement>
+
 			<DoStatement>
+
 				<KeyWord>do</KeyWord>
 
 				<SubRoutineCall>
@@ -404,17 +536,24 @@
 					<Symbol> ( </Symbol>
 
 					</ExpressionList>
+
 						<Expression>
+
 							</Term>
+
 							</Term>
+
 						</Expression>
+
 					</ExpressionList>
+
 					<Symbol> ) </Symbol>
 
 				</SubRoutineCall>
 				<Symbol> ; </Symbol>
 
 			</DoStatement>
+
 			<LetStatement>
 				<KeyWord>return</KeyWord>
 
@@ -422,9 +561,12 @@
 
 			</LetStatement>
 		</Statements>
+
 		<Symbol> } </Symbol>
 
 	</Subroutine>
+
 	<Symbol> } </Symbol>
 
 </Class>
+
