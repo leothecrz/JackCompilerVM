@@ -41,7 +41,7 @@ public class CompilationEngine
     public void compileClass()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<Class>");
         writeLine(sb.toString());
         indintationCount++;
@@ -52,23 +52,22 @@ public class CompilationEngine
             throw new RuntimeException("Not CLASS start.");
         if(!tokenizer.keyword().equals("class"))
             throw new RuntimeException("keyword CLASS missing.");
-        writeKeyword();
+        writeKeyword(); //CLASS
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS.");
         if(tokenizer.tokenType() != TokenType.IDENTIFIER)
             throw new RuntimeException("Missing CLASS name.");
-        writeIdentifier();
+        writeIdentifier(); //CLASS NAME
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS.");
         if(tokenizer.tokenType() != TokenType.SYMBOL)
             throw new RuntimeException("Missing CLASS open bracket.");
-        writeSymbol();
+        writeSymbol(); // {
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS.");
-
         while( (tokenizer.tokenType() == TokenType.KEYWORD) && 
             (tokenizer.keyword().equals("static") || tokenizer.keyword().equals("field") )  )
         {
@@ -83,11 +82,11 @@ public class CompilationEngine
 
         if(tokenizer.tokenType() != TokenType.SYMBOL)
             throw new RuntimeException("Missing CLASS end bracket.");
-        writeSymbol();
+        writeSymbol(); // }
 
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</Class>");
         writeLine(sb.toString());
     }
@@ -95,13 +94,14 @@ public class CompilationEngine
     public void compileClassVarDec()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<ClassVarDec>");
         indintationCount++;
         writeLine(sb.toString());
 
-        writeKeyword();
+        writeKeyword(); // static or field
 
+        //TYPE
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS_VAR_DEC.");
         if(tokenizer.tokenType() != TokenType.KEYWORD || tokenizer.tokenType() != TokenType.IDENTIFIER)
@@ -121,7 +121,7 @@ public class CompilationEngine
             throw new RuntimeException("No more tokens for CLASS_VAR_DEC.");
         if(tokenizer.tokenType() != TokenType.IDENTIFIER)
             throw new RuntimeException("Variable Name Missing");
-        writeIdentifier();
+        writeIdentifier(); // VAR NAME
             
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS_VAR_DEC.");
@@ -130,30 +130,30 @@ public class CompilationEngine
         
         while ( tokenizer.symbol() == ',' ) 
         {
-            writeSymbol();
+            writeSymbol(); // ,
+
             if(!tokenizer.ifTokensAdvance())
                 throw new RuntimeException("No more tokens for CLASS_VAR_DEC.");
             if(tokenizer.tokenType() != TokenType.IDENTIFIER)
                 throw new RuntimeException("Variable Name Missing");
-            writeIdentifier();
+            writeIdentifier(); // VAR NAME
 
             if(!tokenizer.ifTokensAdvance())
                 throw new RuntimeException("No more tokens for CLASS_VAR_DEC.");
+            if(tokenizer.tokenType() != TokenType.SYMBOL)
+                throw new RuntimeException("Missing statement closer. ';'. ");
         }
-        
-        if(tokenizer.symbol() == ';')
-        {
-            writeSymbol();
-        }
-        else
+
+        if(tokenizer.symbol() != ';')
             throw new RuntimeException("Missing statement closer. ';'. ");
+        writeSymbol(); // ;
 
         if(!tokenizer.ifTokensAdvance())
                 throw new RuntimeException("No more tokens for CLASS from (CVD)");
 
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</ClassVarDec>");
         writeLine(sb.toString());
     }
@@ -161,14 +161,14 @@ public class CompilationEngine
     public void compileSubroutine()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<Subroutine>");
         indintationCount++;
         writeLine(sb.toString());
 
-        writeKeyword();
+        writeKeyword(); // Constructor Function Method
 
-        //Void or Type
+        //Void or TYPE
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS_SUB_ROUTE.");
         if(tokenizer.tokenType() != TokenType.KEYWORD && tokenizer.tokenType() != TokenType.IDENTIFIER)
@@ -184,7 +184,7 @@ public class CompilationEngine
         else
             writeIdentifier();
 
-        //SubName
+        //NAME
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS_SUB_ROUTE.");
         if(tokenizer.tokenType() != TokenType.IDENTIFIER)
@@ -193,21 +193,21 @@ public class CompilationEngine
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS_SUB_ROUTE.");
-        if(tokenizer.tokenType() != TokenType.SYMBOL && tokenizer.symbol() == '(')
+        if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() != '(')
             throw new RuntimeException("SUB ROUTINE Opening parenthesis missing.");
-        writeSymbol();
+        writeSymbol(); // (
 
-        compileParameterList();
-        if(tokenizer.tokenType() != TokenType.SYMBOL && tokenizer.symbol() == ')')
+        compileParameterList(); // PARAMLIST
+
+        if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() != ')')
             throw new RuntimeException("SUB ROUTINE Opening parenthesis missing.");
-        writeSymbol();
-        //PARAMS END
-        //BODY START
+        writeSymbol(); // )
+        
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS_SUB_ROUTE.");
-        if(tokenizer.tokenType() != TokenType.SYMBOL && tokenizer.symbol() == '{')
+        if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() != '{')
             throw new RuntimeException("SUB ROUTINE Opening parenthesis missing.");
-        writeSymbol();
+        writeSymbol(); // {
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS_SUB_ROUTE.");
@@ -216,15 +216,14 @@ public class CompilationEngine
             compileVarDec();
         if(tokenizer.tokenType() == TokenType.KEYWORD)
             compileStatements();
-        /////////////RETURN POINT FOR STATEMENTS
+
         if(tokenizer.tokenType() != TokenType.SYMBOL && tokenizer.symbol() == '}')
             throw new RuntimeException("SUB ROUTINE Closing parenthesis missing.");
-        writeSymbol();
-        //BODY END
-
+        writeSymbol(); // }
+        
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</Subroutine>");
         writeLine(sb.toString());
     }
@@ -232,17 +231,23 @@ public class CompilationEngine
     public void compileParameterList()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<Parameter List>");
         indintationCount++;
         writeLine(sb.toString());
 
-
-        //Type
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for ParamList.");
         if(tokenizer.tokenType() == TokenType.SYMBOL)
-            return;
+        {
+            sb = new StringBuilder();
+            indintationCount--;
+            sb.append("\t".repeat(indintationCount));
+            sb.append("</Parameter List>");
+            writeLine(sb.toString());
+            return; // NO PARAMS
+        }
+            
 
         if(tokenizer.tokenType() != TokenType.KEYWORD && tokenizer.tokenType() != TokenType.IDENTIFIER)
             throw new RuntimeException("Var Type Missing");
@@ -256,54 +261,53 @@ public class CompilationEngine
             }
         else
             writeIdentifier();
+        //Type
 
-        //VarName
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for ParamList.");
         if(tokenizer.tokenType() != TokenType.IDENTIFIER)
             throw new RuntimeException("Var Name Missing");
-        writeIdentifier();
+        writeIdentifier(); //VarName
         
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for ParamList.");
-        if(tokenizer.tokenType() == TokenType.SYMBOL)
-            while ( tokenizer.symbol() == ',' ) 
-            {
-                writeSymbol();
-                //Type
-                if(!tokenizer.ifTokensAdvance())
-                    throw new RuntimeException("No more tokens for ParamList.");
-                if(tokenizer.tokenType() != TokenType.KEYWORD || tokenizer.tokenType() != TokenType.IDENTIFIER)
-                    throw new RuntimeException("Var Type Missing");
-                if(tokenizer.tokenType() == TokenType.KEYWORD)
-                    {
-                        String key = tokenizer.keyword();
-                        if(key.equals("int") | key.equals("char") | key.equals("boolean"))
-                            writeKeyword();
-                        else
-                            throw new RuntimeException("Variable Type INVALID");
-                    }
-                else
-                    writeIdentifier();
+        if(tokenizer.tokenType() != TokenType.SYMBOL)
+            throw new RuntimeException("invalid parameter list end.");
 
-                //Name
-                if(!tokenizer.ifTokensAdvance())
-                    throw new RuntimeException("No more tokens for ParamList.");
-                if(tokenizer.tokenType() != TokenType.IDENTIFIER)
-                    throw new RuntimeException("Variable Name Missing");
-                writeIdentifier();
-                
-                if(!tokenizer.ifTokensAdvance())
-                    throw new RuntimeException("No more tokens for ParamList.");
+        while ( tokenizer.symbol() == ',' ) 
+        {
+            writeSymbol(); // ,
 
-                if( (tokenizer.tokenType() != TokenType.SYMBOL) && (tokenizer.symbol() != ',') )
-                    break;
-            }
-        
+            if(!tokenizer.ifTokensAdvance())
+                throw new RuntimeException("No more tokens for ParamList.");
+            if(tokenizer.tokenType() != TokenType.KEYWORD || tokenizer.tokenType() != TokenType.IDENTIFIER)
+                throw new RuntimeException("Var Type Missing");
+            if(tokenizer.tokenType() == TokenType.KEYWORD)
+                {
+                    String key = tokenizer.keyword();
+                    if(key.equals("int") | key.equals("char") | key.equals("boolean"))
+                        writeKeyword();
+                    else
+                        throw new RuntimeException("Variable Type INVALID");
+                }
+            else
+                writeIdentifier(); //Type
+
+            if(!tokenizer.ifTokensAdvance())
+                throw new RuntimeException("No more tokens for ParamList.");
+            if(tokenizer.tokenType() != TokenType.IDENTIFIER)
+                throw new RuntimeException("Variable Name Missing");
+            writeIdentifier(); //Name
+            
+            if(!tokenizer.ifTokensAdvance())
+                throw new RuntimeException("No more tokens for ParamList.");
+            if( (tokenizer.tokenType() != TokenType.SYMBOL))
+                break;
+        }
 
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</Parameter List>");
         writeLine(sb.toString());
     }
@@ -311,14 +315,15 @@ public class CompilationEngine
     public void compileVarDec()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<VarDec>");
         indintationCount++;
         writeLine(sb.toString());
+
         while (tokenizer.keyword().equals("var")) //varDec*
         {
             writeKeyword();
-            //Type
+            
             if(!tokenizer.ifTokensAdvance())
                 throw new RuntimeException("No more tokens for VAR_DEC.");
             if(tokenizer.tokenType() != TokenType.KEYWORD && tokenizer.tokenType() != TokenType.IDENTIFIER)
@@ -332,14 +337,13 @@ public class CompilationEngine
                     throw new RuntimeException("varDEC Return Type INVALID");
             }
             else
-                writeIdentifier();
+                writeIdentifier(); //Type
 
-            //varName
             if(!tokenizer.ifTokensAdvance())
                 throw new RuntimeException("No more tokens for VAR_DEC.");
             if(tokenizer.tokenType() != TokenType.IDENTIFIER)
                 throw new RuntimeException("varDEC Name Missing");
-            writeIdentifier();
+            writeIdentifier(); //varName
 
             if(!tokenizer.ifTokensAdvance())
                 throw new RuntimeException("No more tokens for CLASS_VAR_DEC.");
@@ -348,16 +352,18 @@ public class CompilationEngine
             
             while ( tokenizer.symbol() == ',' ) 
             {
-                writeSymbol();
+                writeSymbol(); // ,
+
                 if(!tokenizer.ifTokensAdvance())
                     throw new RuntimeException("No more tokens for CLASS_VAR_DEC.");
                 if(tokenizer.tokenType() != TokenType.IDENTIFIER)
                     throw new RuntimeException("Variable Name Missing");
-                writeIdentifier();
+                writeIdentifier(); // VarName
 
                 if(!tokenizer.ifTokensAdvance())
                     throw new RuntimeException("No more tokens for CLASS_VAR_DEC.");
             }
+
             if(tokenizer.symbol() == ';')
             {
                 writeSymbol();
@@ -371,9 +377,10 @@ public class CompilationEngine
             if(tokenizer.tokenType() != TokenType.KEYWORD)
                 break;    
         }
+
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</VarDec>");
         writeLine(sb.toString());
     }
@@ -381,7 +388,7 @@ public class CompilationEngine
     public void compileStatements()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<Statements>");
         indintationCount++;
         writeLine(sb.toString());
@@ -400,19 +407,22 @@ public class CompilationEngine
                     compileWhile();
                     break;
                 case "do":
-                    compileWhile();
+                    compileDo();
                     break;
                 case "return":
                     compileReturn();
                     break;
                 default:
                     throw new RuntimeException("Invalid Statement Start");
-            }    
+            }
+
+            if(!tokenizer.ifTokensAdvance())
+                throw new RuntimeException("No more tokens for STATEMENTS.");
         }
 
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</Statements>");
         writeLine(sb.toString());
     }
@@ -420,7 +430,7 @@ public class CompilationEngine
     public void compileDo()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<DoStatement>");
         indintationCount++;
         writeLine(sb.toString());
@@ -433,15 +443,13 @@ public class CompilationEngine
             throw new RuntimeException("do statement subroutine/var/class name missing");
         compileSubroutineCall();
 
-        if(!tokenizer.ifTokensAdvance())
-            throw new RuntimeException("No more tokens for DO_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.SYMBOL)
             throw new RuntimeException("do statement closer missing.");
-        writeSymbol();
+        writeSymbol(); // ;
 
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</DoStatement>");
         writeLine(sb.toString());
     }
@@ -449,7 +457,7 @@ public class CompilationEngine
     public void compileLet()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<LetStatement>");
         indintationCount++;
         writeLine(sb.toString());
@@ -460,14 +468,13 @@ public class CompilationEngine
             throw new RuntimeException("No more tokens for LET_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.IDENTIFIER)
             throw new RuntimeException("let statement variable name Missing");
-        writeIdentifier();
-
+        writeIdentifier();// varName
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for LET_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.SYMBOL)
             throw new RuntimeException("let statement invalid end");
-        writeSymbol();
+        writeSymbol(); // '=' or '['
 
         if(tokenizer.symbol() == '[')
         {
@@ -477,14 +484,14 @@ public class CompilationEngine
             if(type != TokenType.KEYWORD && type != TokenType.IDENTIFIER && type != TokenType.INT_CONST && type != TokenType.STRING_CONST)
                 throw new RuntimeException("let statement invalid end");
             compileExpression(); // WIP
-            //Symbol ACCESS
-            writeSymbol();
+            
+            writeSymbol(); // ']'
 
             if(!tokenizer.ifTokensAdvance())
                 throw new RuntimeException("No more tokens for LET_STATEMENT.");
             if(tokenizer.tokenType() != TokenType.SYMBOL)
                 throw new RuntimeException("let statement invalid end");
-            writeSymbol();
+            writeSymbol(); // '='
         }
 
         if(!tokenizer.ifTokensAdvance())
@@ -500,7 +507,7 @@ public class CompilationEngine
 
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</LetStatement>");
         writeLine(sb.toString());
     }
@@ -508,7 +515,7 @@ public class CompilationEngine
     public void compileWhile()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<LetStatement>");
         indintationCount++;
         writeLine(sb.toString());
@@ -519,7 +526,7 @@ public class CompilationEngine
             throw new RuntimeException("No more tokens for LET_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='(')
             throw new RuntimeException("while statement missing condition parenthesis");
-        writeSymbol();
+        writeSymbol(); // (
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for LET_STATEMENT.");
@@ -528,28 +535,28 @@ public class CompilationEngine
             throw new RuntimeException("let statement invalid end");
         compileExpression(); //WIP
 
-        if(!tokenizer.ifTokensAdvance())
-            throw new RuntimeException("No more tokens for LET_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !=')')
             throw new RuntimeException("while statement missing condition parenthesis");
-        writeSymbol();
+        writeSymbol(); // )
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for LET_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='{')
             throw new RuntimeException("while statement missing body brace");
-        writeSymbol();
-        compileStatements();
+        writeSymbol(); // {
+
         if(!tokenizer.ifTokensAdvance())
-            throw new RuntimeException("No more tokens for LET_STATEMENT.");
+            throw new RuntimeException("No more tokens for CLASS_SUB_ROUTE.");
+        if(tokenizer.tokenType() == TokenType.KEYWORD)
+            compileStatements();
+
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='}')
             throw new RuntimeException("while statement missing body brace");
-        writeSymbol();
-
+        writeSymbol(); // }
 
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</LetStatement>");
         writeLine(sb.toString());
     }
@@ -557,7 +564,7 @@ public class CompilationEngine
     public void compileReturn()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<LetStatement>");
         indintationCount++;
         writeLine(sb.toString());
@@ -580,7 +587,7 @@ public class CompilationEngine
 
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</LetStatement>");
         writeLine(sb.toString());
     }
@@ -588,7 +595,7 @@ public class CompilationEngine
     public void compileIf()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<LetStatement>");
         indintationCount++;
         writeLine(sb.toString());
@@ -598,7 +605,7 @@ public class CompilationEngine
             throw new RuntimeException("No more tokens for IF_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='(')
             throw new RuntimeException("while statement missing condition parenthesis");
-        writeSymbol();
+        writeSymbol(); // (
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for IF_STATEMENT.");
@@ -606,23 +613,51 @@ public class CompilationEngine
 
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !=')')
             throw new RuntimeException("while statement missing condition parenthesis");
-        writeSymbol();
+        writeSymbol(); // )
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for IF_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='{')
             throw new RuntimeException("while statement missing body brace");
-        writeSymbol();
-        compileStatements();
+        writeSymbol(); // {
+
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for IF_STATEMENT.");
+        if(tokenizer.tokenType() == TokenType.KEYWORD)
+            compileStatements(); //WIP
+
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='}')
             throw new RuntimeException("while statement missing body brace");
-        writeSymbol();
+        writeSymbol(); // }
+
+        if(!tokenizer.ifTokensAdvance())
+            throw new RuntimeException("No more tokens for IF_STATEMENT.");
+        
+        if(tokenizer.tokenType() == TokenType.KEYWORD && tokenizer.keyword().equals("else"))
+        {
+            writeKeyword(); // ELSE
+            if(!tokenizer.ifTokensAdvance())
+                throw new RuntimeException("No more tokens for IF_STATEMENT.");
+            if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='{')
+                throw new RuntimeException("while statement missing body brace");
+            writeSymbol(); // {
+
+            if(!tokenizer.ifTokensAdvance())
+                throw new RuntimeException("No more tokens for IF_STATEMENT.");
+            if(tokenizer.tokenType() == TokenType.KEYWORD)
+                compileStatements(); //WIP
+
+            if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='}')
+                throw new RuntimeException("while statement missing body brace");
+            writeSymbol(); // }
+
+            if(!tokenizer.ifTokensAdvance())
+                throw new RuntimeException("No more tokens for IF_STATEMENT.");
+        }
 
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</LetStatement>");
         writeLine(sb.toString());
     }
@@ -630,18 +665,18 @@ public class CompilationEngine
     private void compileSubroutineCall()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<SubRoutineCall>");
         indintationCount++;
         writeLine(sb.toString());
         
-        writeIdentifier();
+        writeIdentifier(); //Name
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for SUBROUTINECALL_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.SYMBOL)
             throw new RuntimeException("sub routine syntax error");
-        writeSymbol();
+        writeSymbol(); // '(' or '.'
 
         if(tokenizer.symbol() == '.')
         {
@@ -649,24 +684,27 @@ public class CompilationEngine
                 throw new RuntimeException("No more tokens for SUBROUTINECALL_STATEMENT.");
             if(tokenizer.tokenType() != TokenType.IDENTIFIER)
                 throw new RuntimeException("sub routine name is missing error");
-            writeIdentifier();
+            writeIdentifier(); // NAME
 
             if(!tokenizer.ifTokensAdvance())
                 throw new RuntimeException("No more tokens for SUBROUTINECALL_STATEMENT.");
             if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='(')
                 throw new RuntimeException("sub missing condition parenthesis");
-            writeSymbol();
+            writeSymbol(); //(
         }
 
         compileExpressionList();
 
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !=')')
              throw new RuntimeException("sub routine missing condition parenthesis");
-        writeSymbol();
+        writeSymbol(); // )
+
+        if(!tokenizer.ifTokensAdvance())
+                throw new RuntimeException("No more tokens for SUBROUTINECALL_STATEMENT.");
 
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</SubRoutineCall>");
         writeLine(sb.toString());
     }
@@ -674,15 +712,13 @@ public class CompilationEngine
     public void compileExpression()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<Expression>");
         indintationCount++;
         writeLine(sb.toString());
 
         compileTerm();
 
-        if(!tokenizer.ifTokensAdvance())
-            throw new RuntimeException("No more tokens for EXPRESSION.");
         while(tokenizer.tokenType() == TokenType.SYMBOL && isOP(tokenizer.symbol()) )
         {
             writeSymbol();
@@ -693,14 +729,11 @@ public class CompilationEngine
             if(type != TokenType.KEYWORD && type != TokenType.IDENTIFIER && type != TokenType.INT_CONST && type != TokenType.STRING_CONST)
                 throw new RuntimeException("expression op requires term");
             compileTerm();
-
-            if(!tokenizer.ifTokensAdvance())
-                throw new RuntimeException("No more tokens for EXPRESSION.");
         }
         
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</Expression>");
         writeLine(sb.toString());
     }
@@ -708,7 +741,7 @@ public class CompilationEngine
     public void compileTerm()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<Term>");
         writeLine(sb.toString());
         indintationCount++;
@@ -720,13 +753,20 @@ public class CompilationEngine
                 break;
             case INT_CONST: 
                 writeIntegerConst();
+                if(!tokenizer.ifTokensAdvance())
+                    throw new RuntimeException("No more tokens for TERM.");
                 break;
             case STRING_CONST:
                 writeStringConst();
+                if(!tokenizer.ifTokensAdvance())
+                throw new RuntimeException("No more tokens for TERM.");
                 break;
             case KEYWORD:    
                 if( !tokenizer.keyword().equals("true") ||  !tokenizer.keyword().equals("false") ||  !tokenizer.keyword().equals("null") || !tokenizer.keyword().equals("this"))
-                    throw new RuntimeException("not a keyword constant");                    
+                    throw new RuntimeException("not a keyword constant");    
+                writeKeyword();
+                if(!tokenizer.ifTokensAdvance())
+                    throw new RuntimeException("No more tokens for TERM.");
                 break;
             case SYMBOL:
                 TermSymbolChecks();
@@ -737,7 +777,7 @@ public class CompilationEngine
 
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</Term>");
         writeLine(sb.toString());
     }
@@ -752,7 +792,8 @@ public class CompilationEngine
                 if(tokenizer.symbol() == ')')
                     writeSymbol();
                 else
-                    //error
+                    throw new RuntimeException("not a term token");
+
                 break;
             //Unary Ops
             case '-':
@@ -765,15 +806,18 @@ public class CompilationEngine
                 compileTerm();
                 break;
         
-            default:
-                throw new RuntimeException("Symbol Not Applicable To Term");
+            default: // pass check up
         }
     }
 
     private void TermIdentifierChecks()
     {
         writeIdentifier();
-        tokenizer.advance();
+
+        if(!tokenizer.ifTokensAdvance())
+        {
+        }
+
         if(tokenizer.tokenType() != TokenType.SYMBOL)
         {
             return;
@@ -782,27 +826,26 @@ public class CompilationEngine
         switch (tokenizer.symbol()) {
             case '[': // VARNAME[expressions]
                 writeSymbol();
-                if(!tokenizer.hasMoreTokens())
+                if(!tokenizer.ifTokensAdvance())
                 {
                     System.err.println("TERM ARRAY ACCESS FAILURE");
                 }
                 compileExpression();
-                tokenizer.advance();
                 writeSymbol();
                 break;
 
             case '(': //Subroutine Call
                 writeSymbol();
-                if(!tokenizer.hasMoreTokens())
+                if(!tokenizer.ifTokensAdvance())
                 {
                     //missing expressions and ')'
                 }
                 compileExpressionList();
-                tokenizer.advance();
                 writeSymbol();
                 break;
 
             case '.': //Subroutine Call
+                writeSymbol();
                 if(!tokenizer.ifTokensAdvance())
                     throw new RuntimeException("No more tokens for TERM.");
                 if(tokenizer.tokenType() != TokenType.IDENTIFIER)
@@ -810,7 +853,7 @@ public class CompilationEngine
                 writeIdentifier();
 
                 if(!tokenizer.ifTokensAdvance())
-                    throw new RuntimeException("No more tokens for SUBROUTINECALL_STATEMENT.");
+                    throw new RuntimeException("No more tokens for TERM.");
                 if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='(')
                     throw new RuntimeException("sub missing condition parenthesis");
                 writeSymbol();
@@ -820,8 +863,20 @@ public class CompilationEngine
                     throw new RuntimeException("sub routine missing condition parenthesis");
                 writeSymbol();
                 break;
-        }
+            
+            case ']':
+            case ')':
+                return;
 
+            default:
+                if(!isOP(tokenizer.symbol()))
+                    throw new RuntimeException("invalid symbol for term");
+                return;
+
+        }
+        
+        if(!tokenizer.ifTokensAdvance())
+            throw new RuntimeException("No more tokens for TERM.");
     }
 
     private boolean isOP(char c)
@@ -845,7 +900,7 @@ public class CompilationEngine
     private void compileExpressionList()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<ExpressionList>");
         indintationCount++;
         writeLine(sb.toString());
@@ -853,18 +908,18 @@ public class CompilationEngine
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for EXPRESSION_LIST.");
         TokenType type = tokenizer.tokenType();
-        if(type == TokenType.KEYWORD || type == TokenType.IDENTIFIER || type == TokenType.INT_CONST || type == TokenType.STRING_CONST )
+        if(type == TokenType.KEYWORD || type == TokenType.IDENTIFIER || type == TokenType.INT_CONST || type == TokenType.STRING_CONST || type == TokenType.SYMBOL )
         {
             compileExpression();
 
             if(tokenizer.tokenType() == TokenType.SYMBOL)
                 while (tokenizer.symbol() == ',') 
                 {
-                    writeSymbol();
+                    writeSymbol(); // ,
                     
                     if(!tokenizer.ifTokensAdvance())
                         throw new RuntimeException("No more tokens for EXPRESSION_LIST.");
-                    if(type != TokenType.KEYWORD || type != TokenType.IDENTIFIER || type != TokenType.INT_CONST || type != TokenType.STRING_CONST)
+                    if(type != TokenType.KEYWORD || type != TokenType.IDENTIFIER || type != TokenType.INT_CONST || type != TokenType.STRING_CONST || type == TokenType.SYMBOL)
                         throw new RuntimeException("expresion list, opened list.");
                     compileExpression();
 
@@ -877,7 +932,7 @@ public class CompilationEngine
             
         sb = new StringBuilder();
         indintationCount--;
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("</ExpressionList>");
         writeLine(sb.toString());
     }
@@ -885,7 +940,7 @@ public class CompilationEngine
     private void writeKeyword()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<KeyWord>");
 
         sb.append(tokenizer.keyword());
@@ -897,7 +952,7 @@ public class CompilationEngine
     private void writeSymbol()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<Symbol> ");
 
         sb.append(tokenizer.symbol());
@@ -909,7 +964,7 @@ public class CompilationEngine
     private void writeIdentifier()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<Identifier> ");
 
         sb.append(tokenizer.identifier());
@@ -921,6 +976,7 @@ public class CompilationEngine
     private void writeStringConst()
     {
         StringBuilder sb = new StringBuilder();
+        sb.append("\t".repeat(indintationCount));
         sb.append("<StringConst> ");
 
         sb.append(tokenizer.stringVal());
@@ -932,7 +988,7 @@ public class CompilationEngine
     private void writeIntegerConst()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(indintationCount));
+        sb.append("\t".repeat(indintationCount));
         sb.append("<IntegerConst> ");
 
         sb.append( String.valueOf( tokenizer.intVal() ) );

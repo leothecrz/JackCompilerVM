@@ -1,89 +1,430 @@
 <Class>
- <KeyWord>class</KeyWord>
+	<KeyWord>class</KeyWord>
 
- <Identifier> Main </Identifier>
+	<Identifier> Main </Identifier>
 
- <Symbol> { </Symbol>
+	<Symbol> { </Symbol>
 
- <Subroutine>
-  <KeyWord>function</KeyWord>
+	<Subroutine>
+		<KeyWord>function</KeyWord>
 
-  <KeyWord>void</KeyWord>
+		<KeyWord>void</KeyWord>
 
-  <Identifier> main </Identifier>
+		<Identifier> main </Identifier>
 
-  <Symbol> ( </Symbol>
+		<Symbol> ( </Symbol>
 
-  <Parameter List>
-   <Symbol> ) </Symbol>
+		<Parameter List>
+		</Parameter List>
+		<Symbol> ) </Symbol>
 
-   <Symbol> { </Symbol>
+		<Symbol> { </Symbol>
 
-   <VarDec>
-    <KeyWord>var</KeyWord>
+		<VarDec>
+			<KeyWord>var</KeyWord>
 
-    <Identifier> Array </Identifier>
+			<Identifier> Array </Identifier>
 
-    <Identifier> a </Identifier>
+			<Identifier> a </Identifier>
 
-    <Symbol> ; </Symbol>
+			<Symbol> ; </Symbol>
 
-    <KeyWord>var</KeyWord>
+			<KeyWord>var</KeyWord>
 
-    <KeyWord>int</KeyWord>
+			<KeyWord>int</KeyWord>
 
-    <Identifier> length </Identifier>
+			<Identifier> length </Identifier>
 
-    <Symbol> ; </Symbol>
+			<Symbol> ; </Symbol>
 
-    <KeyWord>var</KeyWord>
+			<KeyWord>var</KeyWord>
 
-    <KeyWord>int</KeyWord>
+			<KeyWord>int</KeyWord>
 
-    <Identifier> i </Identifier>
+			<Identifier> i </Identifier>
 
-    <Symbol> , </Symbol>
+			<Symbol> , </Symbol>
 
-    <Identifier> sum </Identifier>
+			<Identifier> sum </Identifier>
 
-    <Symbol> ; </Symbol>
+			<Symbol> ; </Symbol>
 
-   </VarDec>
-   <Statements>
-    <LetStatement>
-     <KeyWord>let</KeyWord>
+		</VarDec>
+		<Statements>
+			<LetStatement>
+				<KeyWord>let</KeyWord>
 
-     <Identifier> length </Identifier>
+				<Identifier> length </Identifier>
 
-     <Symbol> = </Symbol>
+				<Symbol> = </Symbol>
 
-     <Expression>
-      <Term>
-       <Identifier> Keyboard </Identifier>
+				<Expression>
+					<Term>
+						<Identifier> Keyboard </Identifier>
 
-       <Identifier> readInt </Identifier>
+						<Symbol> . </Symbol>
 
-       <Symbol> ( </Symbol>
+						<Identifier> readInt </Identifier>
 
-       <ExpressionList>
-        <Expression>
-         <Term>
-<StringConst> "HOW MANY NUMBERS? " </StringConst>
+						<Symbol> ( </Symbol>
 
-         </Term>
-        </Expression>
-       </ExpressionList>
-       <Symbol> ) </Symbol>
+						<ExpressionList>
+							<Expression>
+								<Term>
+									<StringConst> "HOW MANY NUMBERS? " </StringConst>
 
-      </Term>
-     </Expression>
-     <Symbol> ; </Symbol>
+								</Term>
+							</Expression>
+						</ExpressionList>
+						<Symbol> ) </Symbol>
 
-    </LetStatement>
-   </Statements>
-   <Symbol> ; </Symbol>
+					</Term>
+				</Expression>
+				<Symbol> ; </Symbol>
 
-  </Subroutine>
-  <Symbol> ; </Symbol>
+			</LetStatement>
+			<LetStatement>
+				<KeyWord>let</KeyWord>
 
- </Class>
+				<Identifier> a </Identifier>
+
+				<Symbol> = </Symbol>
+
+				<Expression>
+					<Term>
+						<Identifier> Array </Identifier>
+
+						<Symbol> . </Symbol>
+
+						<Identifier> new </Identifier>
+
+						<Symbol> ( </Symbol>
+
+						<ExpressionList>
+							<Expression>
+								<Term>
+									<Identifier> length </Identifier>
+
+								</Term>
+							</Expression>
+						</ExpressionList>
+						<Symbol> ) </Symbol>
+
+					</Term>
+				</Expression>
+				<Symbol> ; </Symbol>
+
+			</LetStatement>
+			<LetStatement>
+				<KeyWord>let</KeyWord>
+
+				<Identifier> i </Identifier>
+
+				<Symbol> = </Symbol>
+
+				<Expression>
+					<Term>
+						<IntegerConst> 0 </IntegerConst>
+
+					</Term>
+				</Expression>
+				<Symbol> ; </Symbol>
+
+			</LetStatement>
+			<LetStatement>
+				<KeyWord>while</KeyWord>
+
+				<Symbol> ( </Symbol>
+
+				<Expression>
+					<Term>
+						<Identifier> i </Identifier>
+
+					</Term>
+					<Symbol> < </Symbol>
+
+					<Term>
+						<Identifier> length </Identifier>
+
+					</Term>
+				</Expression>
+				<Symbol> ) </Symbol>
+
+				<Symbol> { </Symbol>
+
+				<Statements>
+					<LetStatement>
+						<KeyWord>let</KeyWord>
+
+						<Identifier> a </Identifier>
+
+						<Symbol> [ </Symbol>
+
+						<Expression>
+							<Term>
+								<Identifier> i </Identifier>
+
+							</Term>
+						</Expression>
+						<Symbol> ] </Symbol>
+
+						<Symbol> = </Symbol>
+
+						<Expression>
+							<Term>
+								<Identifier> Keyboard </Identifier>
+
+								<Symbol> . </Symbol>
+
+								<Identifier> readInt </Identifier>
+
+								<Symbol> ( </Symbol>
+
+								<ExpressionList>
+									<Expression>
+										<Term>
+											<StringConst> "ENTER THE NEXT NUMBER: " </StringConst>
+
+										</Term>
+									</Expression>
+								</ExpressionList>
+								<Symbol> ) </Symbol>
+
+							</Term>
+						</Expression>
+						<Symbol> ; </Symbol>
+
+					</LetStatement>
+					<LetStatement>
+						<KeyWord>let</KeyWord>
+
+						<Identifier> i </Identifier>
+
+						<Symbol> = </Symbol>
+
+						<Expression>
+							<Term>
+								<Identifier> i </Identifier>
+
+							</Term>
+							<Symbol> + </Symbol>
+
+							<Term>
+								<IntegerConst> 1 </IntegerConst>
+
+							</Term>
+						</Expression>
+						<Symbol> ; </Symbol>
+
+					</LetStatement>
+				</Statements>
+				<Symbol> } </Symbol>
+
+			</LetStatement>
+			<LetStatement>
+				<KeyWord>let</KeyWord>
+
+				<Identifier> i </Identifier>
+
+				<Symbol> = </Symbol>
+
+				<Expression>
+					<Term>
+						<IntegerConst> 0 </IntegerConst>
+
+					</Term>
+				</Expression>
+				<Symbol> ; </Symbol>
+
+			</LetStatement>
+			<LetStatement>
+				<KeyWord>let</KeyWord>
+
+				<Identifier> sum </Identifier>
+
+				<Symbol> = </Symbol>
+
+				<Expression>
+					<Term>
+						<IntegerConst> 0 </IntegerConst>
+
+					</Term>
+				</Expression>
+				<Symbol> ; </Symbol>
+
+			</LetStatement>
+			<LetStatement>
+				<KeyWord>while</KeyWord>
+
+				<Symbol> ( </Symbol>
+
+				<Expression>
+					<Term>
+						<Identifier> i </Identifier>
+
+					</Term>
+					<Symbol> < </Symbol>
+
+					<Term>
+						<Identifier> length </Identifier>
+
+					</Term>
+				</Expression>
+				<Symbol> ) </Symbol>
+
+				<Symbol> { </Symbol>
+
+				<Statements>
+					<LetStatement>
+						<KeyWord>let</KeyWord>
+
+						<Identifier> sum </Identifier>
+
+						<Symbol> = </Symbol>
+
+						<Expression>
+							<Term>
+								<Identifier> sum </Identifier>
+
+							</Term>
+							<Symbol> + </Symbol>
+
+							<Term>
+								<Identifier> a </Identifier>
+
+								<Symbol> [ </Symbol>
+
+								<Expression>
+									<Term>
+										<Identifier> i </Identifier>
+
+									</Term>
+								</Expression>
+								<Symbol> ] </Symbol>
+
+							</Term>
+						</Expression>
+						<Symbol> ; </Symbol>
+
+					</LetStatement>
+					<LetStatement>
+						<KeyWord>let</KeyWord>
+
+						<Identifier> i </Identifier>
+
+						<Symbol> = </Symbol>
+
+						<Expression>
+							<Term>
+								<Identifier> i </Identifier>
+
+							</Term>
+							<Symbol> + </Symbol>
+
+							<Term>
+								<IntegerConst> 1 </IntegerConst>
+
+							</Term>
+						</Expression>
+						<Symbol> ; </Symbol>
+
+					</LetStatement>
+				</Statements>
+				<Symbol> } </Symbol>
+
+			</LetStatement>
+			<DoStatement>
+				<KeyWord>do</KeyWord>
+
+				<SubRoutineCall>
+					<Identifier> Output </Identifier>
+
+					<Symbol> . </Symbol>
+
+					<Identifier> printString </Identifier>
+
+					<Symbol> ( </Symbol>
+
+					<ExpressionList>
+						<Expression>
+							<Term>
+								<StringConst> "THE AVERAGE IS: " </StringConst>
+
+							</Term>
+						</Expression>
+					</ExpressionList>
+					<Symbol> ) </Symbol>
+
+				</SubRoutineCall>
+				<Symbol> ; </Symbol>
+
+			</DoStatement>
+			<DoStatement>
+				<KeyWord>do</KeyWord>
+
+				<SubRoutineCall>
+					<Identifier> Output </Identifier>
+
+					<Symbol> . </Symbol>
+
+					<Identifier> printInt </Identifier>
+
+					<Symbol> ( </Symbol>
+
+					<ExpressionList>
+						<Expression>
+							<Term>
+								<Identifier> sum </Identifier>
+
+							</Term>
+							<Symbol> / </Symbol>
+
+							<Term>
+								<Identifier> length </Identifier>
+
+							</Term>
+						</Expression>
+					</ExpressionList>
+					<Symbol> ) </Symbol>
+
+				</SubRoutineCall>
+				<Symbol> ; </Symbol>
+
+			</DoStatement>
+			<DoStatement>
+				<KeyWord>do</KeyWord>
+
+				<SubRoutineCall>
+					<Identifier> Output </Identifier>
+
+					<Symbol> . </Symbol>
+
+					<Identifier> println </Identifier>
+
+					<Symbol> ( </Symbol>
+
+					<ExpressionList>
+						<Expression>
+							<Term>
+							</Term>
+						</Expression>
+					</ExpressionList>
+					<Symbol> ) </Symbol>
+
+				</SubRoutineCall>
+				<Symbol> ; </Symbol>
+
+			</DoStatement>
+			<LetStatement>
+				<KeyWord>return</KeyWord>
+
+				<Symbol> ; </Symbol>
+
+			</LetStatement>
+		</Statements>
+		<Symbol> } </Symbol>
+
+	</Subroutine>
+	<Symbol> } </Symbol>
+
+</Class>
