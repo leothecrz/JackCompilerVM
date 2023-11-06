@@ -213,6 +213,7 @@ public class CompilationEngine
         if(tokenizer.tokenType() == TokenType.SYMBOL)
         {
             closeTagAndDecrementIndent("</Parameter List>");
+            return;
         }
             
 

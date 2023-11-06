@@ -59,7 +59,7 @@
 				<Symbol> = </Symbol>
 
 				<Expression>
-					<Term>
+					</Term>
 						<Identifier> Keyboard </Identifier>
 
 						<Symbol> . </Symbol>
@@ -68,9 +68,9 @@
 
 						<Symbol> ( </Symbol>
 
-						<ExpressionList>
+						</ExpressionList>
 							<Expression>
-								<Term>
+								</Term>
 									<StringConst> "HOW MANY NUMBERS? " </StringConst>
 
 								</Term>
@@ -91,7 +91,7 @@
 				<Symbol> = </Symbol>
 
 				<Expression>
-					<Term>
+					</Term>
 						<Identifier> Array </Identifier>
 
 						<Symbol> . </Symbol>
@@ -100,9 +100,9 @@
 
 						<Symbol> ( </Symbol>
 
-						<ExpressionList>
+						</ExpressionList>
 							<Expression>
-								<Term>
+								</Term>
 									<Identifier> length </Identifier>
 
 								</Term>
@@ -123,7 +123,7 @@
 				<Symbol> = </Symbol>
 
 				<Expression>
-					<Term>
+					</Term>
 						<IntegerConst> 0 </IntegerConst>
 
 					</Term>
@@ -131,19 +131,19 @@
 				<Symbol> ; </Symbol>
 
 			</LetStatement>
-			<LetStatement>
+			<WhileStatement>
 				<KeyWord>while</KeyWord>
 
 				<Symbol> ( </Symbol>
 
 				<Expression>
-					<Term>
+					</Term>
 						<Identifier> i </Identifier>
 
 					</Term>
 					<Symbol> < </Symbol>
 
-					<Term>
+					</Term>
 						<Identifier> length </Identifier>
 
 					</Term>
@@ -161,7 +161,7 @@
 						<Symbol> [ </Symbol>
 
 						<Expression>
-							<Term>
+							</Term>
 								<Identifier> i </Identifier>
 
 							</Term>
@@ -171,7 +171,7 @@
 						<Symbol> = </Symbol>
 
 						<Expression>
-							<Term>
+							</Term>
 								<Identifier> Keyboard </Identifier>
 
 								<Symbol> . </Symbol>
@@ -180,9 +180,9 @@
 
 								<Symbol> ( </Symbol>
 
-								<ExpressionList>
+								</ExpressionList>
 									<Expression>
-										<Term>
+										</Term>
 											<StringConst> "ENTER THE NEXT NUMBER: " </StringConst>
 
 										</Term>
@@ -203,13 +203,13 @@
 						<Symbol> = </Symbol>
 
 						<Expression>
-							<Term>
+							</Term>
 								<Identifier> i </Identifier>
 
 							</Term>
 							<Symbol> + </Symbol>
 
-							<Term>
+							</Term>
 								<IntegerConst> 1 </IntegerConst>
 
 							</Term>
@@ -220,7 +220,7 @@
 				</Statements>
 				<Symbol> } </Symbol>
 
-			</LetStatement>
+			</WhileStatement>
 			<LetStatement>
 				<KeyWord>let</KeyWord>
 
@@ -229,7 +229,7 @@
 				<Symbol> = </Symbol>
 
 				<Expression>
-					<Term>
+					</Term>
 						<IntegerConst> 0 </IntegerConst>
 
 					</Term>
@@ -245,7 +245,7 @@
 				<Symbol> = </Symbol>
 
 				<Expression>
-					<Term>
+					</Term>
 						<IntegerConst> 0 </IntegerConst>
 
 					</Term>
@@ -253,19 +253,19 @@
 				<Symbol> ; </Symbol>
 
 			</LetStatement>
-			<LetStatement>
+			<WhileStatement>
 				<KeyWord>while</KeyWord>
 
 				<Symbol> ( </Symbol>
 
 				<Expression>
-					<Term>
+					</Term>
 						<Identifier> i </Identifier>
 
 					</Term>
 					<Symbol> < </Symbol>
 
-					<Term>
+					</Term>
 						<Identifier> length </Identifier>
 
 					</Term>
@@ -283,19 +283,19 @@
 						<Symbol> = </Symbol>
 
 						<Expression>
-							<Term>
+							</Term>
 								<Identifier> sum </Identifier>
 
 							</Term>
 							<Symbol> + </Symbol>
 
-							<Term>
+							</Term>
 								<Identifier> a </Identifier>
 
 								<Symbol> [ </Symbol>
 
 								<Expression>
-									<Term>
+									</Term>
 										<Identifier> i </Identifier>
 
 									</Term>
@@ -315,13 +315,13 @@
 						<Symbol> = </Symbol>
 
 						<Expression>
-							<Term>
+							</Term>
 								<Identifier> i </Identifier>
 
 							</Term>
 							<Symbol> + </Symbol>
 
-							<Term>
+							</Term>
 								<IntegerConst> 1 </IntegerConst>
 
 							</Term>
@@ -332,7 +332,7 @@
 				</Statements>
 				<Symbol> } </Symbol>
 
-			</LetStatement>
+			</WhileStatement>
 			<DoStatement>
 				<KeyWord>do</KeyWord>
 
@@ -345,9 +345,9 @@
 
 					<Symbol> ( </Symbol>
 
-					<ExpressionList>
+					</ExpressionList>
 						<Expression>
-							<Term>
+							</Term>
 								<StringConst> "THE AVERAGE IS: " </StringConst>
 
 							</Term>
@@ -371,15 +371,15 @@
 
 					<Symbol> ( </Symbol>
 
-					<ExpressionList>
+					</ExpressionList>
 						<Expression>
-							<Term>
+							</Term>
 								<Identifier> sum </Identifier>
 
 							</Term>
 							<Symbol> / </Symbol>
 
-							<Term>
+							</Term>
 								<Identifier> length </Identifier>
 
 							</Term>
@@ -403,9 +403,9 @@
 
 					<Symbol> ( </Symbol>
 
-					<ExpressionList>
+					</ExpressionList>
 						<Expression>
-							<Term>
+							</Term>
 							</Term>
 						</Expression>
 					</ExpressionList>
