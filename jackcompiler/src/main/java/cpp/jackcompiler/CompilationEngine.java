@@ -15,25 +15,27 @@ public class CompilationEngine
     public CompilationEngine(File inFile)
     {
         indentationCount = 0;
-        
         tokenizer = new JackTokenizer(inFile);
-        
         File outFile = new File( inFile.getPath().concat(".vm") ); // Filepath[.jack]->Filepath[.vm]
-        
-        try {
+        try 
+        {
             outFile.createNewFile();
             writer = new FileWriter(outFile);
-        } catch (IOException e) {
+        } 
+        catch (IOException e) 
+        {
             e.printStackTrace();
         }
-
     }
 
     public void closeWriter()
     {
-        try {
+        try 
+        {
             writer.close();
-        } catch (IOException e) {
+        } 
+        catch (IOException e) 
+        {
             e.printStackTrace();
         }
     }
@@ -89,21 +91,7 @@ public class CompilationEngine
 
         writeKeyword(); // static or field
 
-        //TYPE
-        if(!tokenizer.ifTokensAdvance())
-            throw new RuntimeException("No more tokens for CLASS_VAR_DEC.");
-        if(tokenizer.tokenType() != TokenType.KEYWORD || tokenizer.tokenType() != TokenType.IDENTIFIER)
-            throw new RuntimeException("Variable Type Missing");
-        if(tokenizer.tokenType() == TokenType.KEYWORD)
-            {
-                String key = tokenizer.keyword();
-                if(key.equals("int") | key.equals("char") | key.equals("boolean"))
-                    writeKeyword();
-                else
-                    throw new RuntimeException("Variable Type INVALID");
-            }
-        else
-            writeIdentifier();
+        compileType(false, "CLASS_VAR_DEC", "var");
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS_VAR_DEC.");
@@ -148,22 +136,8 @@ public class CompilationEngine
 
         writeKeyword(); // Constructor Function Method
 
-        //Void or TYPE
-        if(!tokenizer.ifTokensAdvance())
-            throw new RuntimeException("No more tokens for CLASS_SUB_ROUTE.");
-        if(tokenizer.tokenType() != TokenType.KEYWORD && tokenizer.tokenType() != TokenType.IDENTIFIER)
-            throw new RuntimeException("Subroutine Return Type Missing");
-        if(tokenizer.tokenType() == TokenType.KEYWORD)
-            {
-                String key = tokenizer.keyword();
-                if(key.equals("void") | key.equals("int") | key.equals("char") | key.equals("boolean"))
-                    writeKeyword();
-                else
-                    throw new RuntimeException("Subroutine Return Type INVALID");
-            }
-        else
-            writeIdentifier();
-
+        compileType(true, "SUB_ROUTINE", "sub_route");
+        
         //NAME
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for CLASS_SUB_ROUTE.");
@@ -215,8 +189,6 @@ public class CompilationEngine
             closeTagAndDecrementIndent("</Parameter List>");
             return;
         }
-            
-
         if(tokenizer.tokenType() != TokenType.KEYWORD && tokenizer.tokenType() != TokenType.IDENTIFIER)
             throw new RuntimeException("Var Type Missing");
         if(tokenizer.tokenType() == TokenType.KEYWORD)
@@ -228,8 +200,8 @@ public class CompilationEngine
                     throw new RuntimeException("Variable Type INVALID");
             }
         else
-            writeIdentifier();
-        //Type
+            writeIdentifier(); //TYPE
+        
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for ParamList.");
@@ -246,20 +218,7 @@ public class CompilationEngine
         {
             writeSymbol(); // ,
 
-            if(!tokenizer.ifTokensAdvance())
-                throw new RuntimeException("No more tokens for ParamList.");
-            if(tokenizer.tokenType() != TokenType.KEYWORD || tokenizer.tokenType() != TokenType.IDENTIFIER)
-                throw new RuntimeException("Var Type Missing");
-            if(tokenizer.tokenType() == TokenType.KEYWORD)
-                {
-                    String key = tokenizer.keyword();
-                    if(key.equals("int") | key.equals("char") | key.equals("boolean"))
-                        writeKeyword();
-                    else
-                        throw new RuntimeException("Variable Type INVALID");
-                }
-            else
-                writeIdentifier(); //Type
+            compileType(false, "PARAM_LIST", "param");
 
             if(!tokenizer.ifTokensAdvance())
                 throw new RuntimeException("No more tokens for ParamList.");
@@ -284,21 +243,8 @@ public class CompilationEngine
         {
             writeKeyword();
             
-            if(!tokenizer.ifTokensAdvance())
-                throw new RuntimeException("No more tokens for VAR_DEC.");
-            if(tokenizer.tokenType() != TokenType.KEYWORD && tokenizer.tokenType() != TokenType.IDENTIFIER)
-                throw new RuntimeException("varDEC Type Missing");
-            if(tokenizer.tokenType() == TokenType.KEYWORD)
-            {
-                String key = tokenizer.keyword();
-                if(key.equals("int") | key.equals("char") | key.equals("boolean"))
-                    writeKeyword();
-                else
-                    throw new RuntimeException("varDEC Return Type INVALID");
-            }
-            else
-                writeIdentifier(); //Type
-
+            compileType(false, "VAR_DEC", "varDec");
+        
             if(!tokenizer.ifTokensAdvance())
                 throw new RuntimeException("No more tokens for VAR_DEC.");
             if(tokenizer.tokenType() != TokenType.IDENTIFIER)
@@ -808,7 +754,7 @@ public class CompilationEngine
 
     private void compileExpressionList()
     {
-        openTagAndIncrementIndent("</ExpressionList>");
+        openTagAndIncrementIndent("<ExpressionList>");
 
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for EXPRESSION_LIST.");
@@ -836,6 +782,25 @@ public class CompilationEngine
         }
         
         closeTagAndDecrementIndent("</ExpressionList>");
+    }
+
+    private void compileType(boolean addVoid, String caller, String typeFor)
+    {
+        //Void or TYPE
+        if(!tokenizer.ifTokensAdvance())
+            throw new RuntimeException("No more tokens for " + caller);
+        if(tokenizer.tokenType() != TokenType.KEYWORD && tokenizer.tokenType() != TokenType.IDENTIFIER)
+            throw new RuntimeException("Type missing for " + typeFor);
+        if(tokenizer.tokenType() == TokenType.KEYWORD)
+            {
+                String key = tokenizer.keyword();
+                if(key.equals("int") || key.equals("char") || key.equals("boolean") || (addVoid ? key.equals("void") : false)  )
+                    writeKeyword();
+                else
+                    throw new RuntimeException("Type is INVALID for " + typeFor);
+            }
+        else
+            writeIdentifier();
     }
 
     private void writeKeyword()
@@ -928,5 +893,4 @@ public class CompilationEngine
         writeLine(sb.toString());
     }
 
-    
 }

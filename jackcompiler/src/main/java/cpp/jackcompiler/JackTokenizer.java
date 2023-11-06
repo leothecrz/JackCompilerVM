@@ -208,7 +208,7 @@ public class JackTokenizer
     public String keyword()
     {
         if(this.activeTokenType != TokenType.KEYWORD)
-            printError("KEYWORD");
+            printError("KEYWORD", "Compilation Failure");
 
         return activeKeyword;
     }
@@ -216,39 +216,39 @@ public class JackTokenizer
     public char symbol()
     {
         if(this.activeTokenType != TokenType.SYMBOL)
-            printError("SYMBOL");
+            printError("SYMBOL", "Compilation Failure");
         return activeSym;
     }
 
     public String identifier()
     {
         if(this.activeTokenType != TokenType.IDENTIFIER)
-            printError("IDENTIFIER");
+            printError("IDENTIFIER", "Compilation Failure");
         return activeKeyword;
     }
 
     public int intVal()
     {
         if(this.activeTokenType != TokenType.INT_CONST)
-            printError("INTEGER CONSTANT");
+            printError("INTEGER CONSTANT", "Compilation Failure");
         return activeInt;
     }
 
     public String stringVal()
     {
         if(this.activeTokenType != TokenType.STRING_CONST)
-            printError("STRING CONSTANT");
+            printError("STRING CONSTANT", "Compilation Failure");
         return activeKeyword;
     }
     
-    private void printError(String source)
+    public void printError(String source, String str)
     {
         System.err.println("Attempted to get value for " + source);
         System.err.println("While state is: ");
         System.err.println("Line Number: " + String.valueOf(lineNumber));
         System.err.println("TokenType: " + this.tokenType());
         System.err.println(activeline);
-        throw new RuntimeException("Compilation Failure");
+        throw new RuntimeException(str);
     }
     private class StackToken
     {
