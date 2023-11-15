@@ -245,9 +245,33 @@ public class JackTokenizer
     {
         System.err.println("Attempted to get value for " + source);
         System.err.println("While state is: ");
-        System.err.println("Line Number: " + String.valueOf(lineNumber));
-        System.err.println("TokenType: " + this.tokenType());
-        System.err.println(activeline);
+        System.err.println("  Line Number: " + String.valueOf(lineNumber));
+        System.err.println("  TokenType: " + this.tokenType());
+        System.err.println("  Line: " + activeline);
+
+        String data = "";
+        switch (tokenType()) {
+            case IDENTIFIER:
+                data = identifier();
+                break;
+            case INT_CONST:
+                data = String.valueOf(intVal());
+                break;
+            case STRING_CONST:
+                data = stringVal();
+                break;
+            case SYMBOL:
+                data = String.valueOf(symbol());
+                break;
+            case KEYWORD:
+                data = keyword();
+                break;
+            case UNSET:
+                break;
+        }
+        System.err.println("  DATA: " + data);
+
+        System.err.println();
         throw new RuntimeException(str);
     }
     private class StackToken

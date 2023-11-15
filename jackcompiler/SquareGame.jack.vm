@@ -1,0 +1,172 @@
+<Class>
+
+	<KeyWord>class</KeyWord>
+
+	<Identifier> SquareGame </Identifier>
+
+	<Symbol> { </Symbol>
+
+	<ClassVarDec>
+
+		<KeyWord>field</KeyWord>
+
+		<Identifier> Square </Identifier>
+
+		<Identifier> square </Identifier>
+
+		<Symbol> ; </Symbol>
+
+	</ClassVarDec>
+
+	<ClassVarDec>
+
+		<KeyWord>field</KeyWord>
+
+		<KeyWord>int</KeyWord>
+
+		<Identifier> direction </Identifier>
+
+		<Symbol> ; </Symbol>
+
+	</ClassVarDec>
+
+	<Subroutine>
+
+		<KeyWord>constructor</KeyWord>
+
+		<Identifier> SquareGame </Identifier>
+
+		<Identifier> new </Identifier>
+
+		<Symbol> ( </Symbol>
+
+		<Parameter List>
+
+		</Parameter List>
+
+		<Symbol> ) </Symbol>
+
+		<Symbol> { </Symbol>
+
+		<VarDec>
+
+		</VarDec>
+
+		<Statements>
+
+			<LetStatement>
+
+				<KeyWord>let</KeyWord>
+
+				<Identifier> square </Identifier>
+
+				<Symbol> = </Symbol>
+
+				<Expression>
+
+					</Term>
+
+						<Identifier> Square </Identifier>
+
+						<Symbol> . </Symbol>
+
+						<Identifier> new </Identifier>
+
+						<Symbol> ( </Symbol>
+
+						<ExpressionList>
+
+							<Expression>
+
+								</Term>
+
+									<IntegerConst> 0 </IntegerConst>
+
+								</Term>
+
+							</Expression>
+
+							<Symbol> , </Symbol>
+
+							<Expression>
+
+								</Term>
+
+									<IntegerConst> 0 </IntegerConst>
+
+								</Term>
+
+							</Expression>
+
+							<Symbol> , </Symbol>
+
+							<Expression>
+
+								</Term>
+
+									<IntegerConst> 30 </IntegerConst>
+
+								</Term>
+
+							</Expression>
+
+						</ExpressionList>
+
+						<Symbol> ) </Symbol>
+
+					</Term>
+
+				</Expression>
+
+				<Symbol> ; </Symbol>
+
+			</LetStatement>
+
+			<LetStatement>
+
+				<KeyWord>let</KeyWord>
+
+				<Identifier> direction </Identifier>
+
+				<Symbol> = </Symbol>
+
+				<Expression>
+
+					</Term>
+
+						<IntegerConst> 0 </IntegerConst>
+
+					</Term>
+
+				</Expression>
+
+				<Symbol> ; </Symbol>
+
+			</LetStatement>
+
+			<LetStatement>
+				<KeyWord>return</KeyWord>
+
+				<Expression>
+
+					</Term>
+
+						<KeyWord>this</KeyWord>
+
+					</Term>
+
+				</Expression>
+
+				<Symbol> ; </Symbol>
+
+			</LetStatement>
+		</Statements>
+
+		<Symbol> } </Symbol>
+
+	</Subroutine>
+
+	<Symbol> } </Symbol>
+
+</Class>
+

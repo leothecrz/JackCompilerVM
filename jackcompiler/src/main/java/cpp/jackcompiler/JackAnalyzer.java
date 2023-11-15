@@ -22,6 +22,12 @@ public class JackAnalyzer
             File[] files = inputFile.listFiles();
             for (File file : files) 
             {
+
+                //Restric To '.jack files'
+                int lastDot = file.getPath().lastIndexOf('.');
+                if( !file.getPath().substring(lastDot).contains("jack") )
+                    continue;
+
                 File output = new File( file.getPath().concat(".vm"));
                 if(output.exists())
                 {
@@ -46,6 +52,15 @@ public class JackAnalyzer
         }
         else
         {
+
+            //Restric To '.jack files'
+            int lastDot = inputFile.getPath().lastIndexOf('.');
+            if( !inputFile.getPath().substring(lastDot).contains("jack") )  
+            {
+                System.out.println("Not a '.jack' file");
+                return;
+            }
+
             File output = new File( inputFile.getPath().concat(".vm"));
             if(output.exists())
             {
@@ -68,7 +83,5 @@ public class JackAnalyzer
             CE.compileClass();
             CE.closeWriter();
         }
-
-
     }
 }

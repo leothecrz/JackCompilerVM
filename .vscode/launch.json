@@ -11,8 +11,8 @@
             "mainClass": "${file}",
             "args": 
             [
-                "\\Users\\Repo\\Java\\MyJackCompiller\\JackCompilerVM\\jackcompiler\\Main.jack"
-            ],
+                "\\Users\\Leonardo\\Documents\\REPO\\Java\\JackCompilerVM\\jackcompiler\\SquareGame.jack",
+            ]
         },
         {
             "type": "java",
