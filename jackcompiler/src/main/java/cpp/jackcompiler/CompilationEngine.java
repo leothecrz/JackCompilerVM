@@ -11,6 +11,7 @@ public class CompilationEngine
     private JackTokenizer tokenizer;
     private FileWriter writer;
 
+    private SymbolTable symTable;
 
     //In file should be confirm as .jack outisde of engine. outfile should also be assured to not exist.
     public CompilationEngine(File inFile)
@@ -26,7 +27,9 @@ public class CompilationEngine
         catch (IOException e) 
         {
             e.printStackTrace();
-        }        
+        }       
+        
+        symTable = new SymbolTable();
     }
 
     public void closeWriter()
@@ -89,17 +92,22 @@ public class CompilationEngine
     public void compileClassVarDec()
     {
         openTagAndIncrementIndent("<ClassVarDec>");
-
+     
+        String key = tokenizer.keyword();
         writeKeyword(); // static or field
 
-        compileType(false, "CLASS_VAR_DEC", "var");
+        String type = compileType(false, "CLASS_VAR_DEC", "var");
 
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Class Var Dec Identifier","No more tokens for CLASS_VAR_DEC.");
         if(tokenizer.tokenType() != TokenType.IDENTIFIER)
             tokenizer.printError("Class Var Dec Identifier","Variable Name Missing");
+        String identifier = tokenizer.identifier();
         writeIdentifier(); // VAR NAME
-            
+
+        Kind knd = key.equals("static") ? Kind.STATIC : Kind.FIELD;
+        symTable.Define(identifier, type, knd);
+
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Class Var Dec -Symbol","No more tokens for CLASS_VAR_DEC.");
         if(tokenizer.tokenType() != TokenType.SYMBOL)
@@ -113,7 +121,10 @@ public class CompilationEngine
                 tokenizer.printError("Class Var Dec - Identifier","No more tokens for CLASS_VAR_DEC.");
             if(tokenizer.tokenType() != TokenType.IDENTIFIER)
                 tokenizer.printError("Class Var Dec - Identifier","Variable Name Missing");
+            identifier = tokenizer.identifier();
             writeIdentifier(); // VAR NAME
+
+            symTable.Define(identifier, type, knd);
 
             if(!tokenizer.ifTokensAdvance())
                 tokenizer.printError("Class Var Dec - Symbol","No more tokens for CLASS_VAR_DEC.");
@@ -242,15 +253,19 @@ public class CompilationEngine
 
         while (tokenizer.keyword().equals("var")) //varDec*
         {
+            String key = tokenizer.keyword();
             writeKeyword();
             
-            compileType(false, "VAR_DEC", "varDec");
+            String type = compileType(false, "VAR_DEC", "varDec");
         
             if(!tokenizer.ifTokensAdvance())
                 tokenizer.printError("Var Dec - Identifier ","No more tokens for VAR_DEC.");
             if(tokenizer.tokenType() != TokenType.IDENTIFIER)
                 tokenizer.printError("Var Dec - Identifier ","varDEC Name Missing");
+            String identifier = tokenizer.identifier();
             writeIdentifier(); //varName
+
+            symTable.Define(identifier, type, Kind.VAR);
 
             if(!tokenizer.ifTokensAdvance())
                 tokenizer.printError("Var Dec - Symbol","No more tokens for CLASS_VAR_DEC.");
@@ -265,7 +280,10 @@ public class CompilationEngine
                     tokenizer.printError("Var Dec - Auxiliary Identifier","No more tokens for CLASS_VAR_DEC.");
                 if(tokenizer.tokenType() != TokenType.IDENTIFIER)
                     tokenizer.printError("Var Dec - Auxiliary Identifier","Variable Name Missing");
+                identifier = tokenizer.identifier();
                 writeIdentifier(); // VarName
+
+                symTable.Define(identifier, type, Kind.VAR);
 
                 if(!tokenizer.ifTokensAdvance())
                     tokenizer.printError("Var Dec - Symbol","No more tokens for CLASS_VAR_DEC.");
@@ -351,7 +369,7 @@ public class CompilationEngine
             tokenizer.printError("Statement Let- Identifier","No more tokens for LET_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.IDENTIFIER)
             tokenizer.printError("Statement Let- Identifier","let statement variable name Missing");
-        writeIdentifier();// varName
+        writeIdentifier(); // varName
 
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Statement Let- Symbol","No more tokens for LET_STATEMENT.");
@@ -763,8 +781,9 @@ public class CompilationEngine
         closeTagAndDecrementIndent("</expressionList>");
     }
 
-    private void compileType(boolean addVoid, String caller, String typeFor)
+    private String compileType(boolean addVoid, String caller, String typeFor)
     {
+        String type;
         //Void or TYPE
         if(!tokenizer.ifTokensAdvance())
             throw new RuntimeException("No more tokens for " + caller);
@@ -774,12 +793,19 @@ public class CompilationEngine
             {
                 String key = tokenizer.keyword();
                 if(key.equals("int") || key.equals("char") || key.equals("boolean") || (addVoid ? key.equals("void") : false)  )
+                {
+                    type = tokenizer.keyword();
                     writeKeyword();
+                }   
                 else
                     throw new RuntimeException("Type is INVALID for " + typeFor);
             }
         else
+        {
+            type = tokenizer.identifier();
             writeIdentifier();
+        }
+        return type;
     }
 
     private void writeKeyword()
