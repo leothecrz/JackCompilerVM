@@ -13,6 +13,9 @@ public class CompilationEngine
 
     private SymbolTable symTable;
 
+
+    private String className;
+
     //In file should be confirm as .jack outisde of engine. outfile should also be assured to not exist.
     public CompilationEngine(File inFile)
     {
@@ -60,6 +63,7 @@ public class CompilationEngine
             tokenizer.printError("class identifier","No more tokens for CLASS.");
         if(tokenizer.tokenType() != TokenType.IDENTIFIER)
             tokenizer.printError("class identifier","Missing CLASS name.");
+        className = tokenizer.identifier();
         writeIdentifier(); //CLASS NAME
 
         if(!tokenizer.ifTokensAdvance())
@@ -146,6 +150,9 @@ public class CompilationEngine
     {
         openTagAndIncrementIndent("<Subroutine>");
 
+        symTable.StartSubroutine();
+        symTable.Define("this", className, Kind.ARG);
+
         writeKeyword(); // Constructor Function Method
 
         compileType(true, "SUB_ROUTINE", "sub_route");
@@ -201,26 +208,36 @@ public class CompilationEngine
             closeTagAndDecrementIndent("</parameterList>");
             return;
         }
+        String type = "";
         if(tokenizer.tokenType() != TokenType.KEYWORD && tokenizer.tokenType() != TokenType.IDENTIFIER)
             tokenizer.printError("ParameterList - Var Type","Var Type Missing");
         if(tokenizer.tokenType() == TokenType.KEYWORD)
             {
                 String key = tokenizer.keyword();
                 if(key.equals("int") | key.equals("char") | key.equals("boolean"))
+                {
+                    type = tokenizer.keyword();
                     writeKeyword();
+                }
                 else
                     tokenizer.printError("ParameterList - Var Type","Variable Type INVALID");
             }
         else
+        {
+            type = tokenizer.identifier();
             writeIdentifier(); //TYPE
+        }
         
 
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("ParameterList -Identifier","No more tokens for ParamList.");
         if(tokenizer.tokenType() != TokenType.IDENTIFIER)
             tokenizer.printError("ParameterList -Identifier","Var Name Missing");
+        String name = tokenizer.identifier(); 
         writeIdentifier(); //VarName
         
+        symTable.Define(name, type, Kind.ARG);
+
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("ParameterList -Symbol","No more tokens for ParamList.");
         if(tokenizer.tokenType() != TokenType.SYMBOL)
@@ -230,13 +247,16 @@ public class CompilationEngine
         {
             writeSymbol(); // ,
 
-            compileType(false, "PARAM_LIST", "param");
+            type = compileType(false, "PARAM_LIST", "param");
 
             if(!tokenizer.ifTokensAdvance())
                 tokenizer.printError("ParameterList - Auxiliary identifiers","No more tokens for ParamList.");
             if(tokenizer.tokenType() != TokenType.IDENTIFIER)
                 tokenizer.printError("ParameterList - Auxiliary identifiers","Variable Name Missing");
+            name = tokenizer.identifier(); 
             writeIdentifier(); //Name
+
+            symTable.Define(name, type, Kind.ARG);
             
             if(!tokenizer.ifTokensAdvance())
                 tokenizer.printError("ParameterList - symbol","No more tokens for ParamList.");
@@ -253,7 +273,6 @@ public class CompilationEngine
 
         while (tokenizer.keyword().equals("var")) //varDec*
         {
-            String key = tokenizer.keyword();
             writeKeyword();
             
             String type = compileType(false, "VAR_DEC", "varDec");
