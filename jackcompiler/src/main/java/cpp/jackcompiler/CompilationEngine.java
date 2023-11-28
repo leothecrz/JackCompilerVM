@@ -479,9 +479,6 @@ public class CompilationEngine
 
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Statement Let - Expression","No more tokens for LET_STATEMENT.");
-        TokenType type = tokenizer.tokenType();
-        if(type != TokenType.KEYWORD && type != TokenType.IDENTIFIER && type != TokenType.INT_CONST && type != TokenType.STRING_CONST)
-            tokenizer.printError("Statement Let - Expression","let statement invalid end");
         compileExpression(); //WIP
 
         if(arrayAccess)
