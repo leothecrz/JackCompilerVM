@@ -37,6 +37,8 @@ public class SymbolTable
     public void StartSubroutine()
     {
         subroutineScopeTable.clear();
+        kindCounts.put(Kind.ARG, 0);
+        kindCounts.put(Kind.VAR, 0);
     }
 
     public void Define(String name, String type, Kind knd)
@@ -92,6 +94,23 @@ public class SymbolTable
             return classScopeTable.get(name).index;
         else
             return -1;
+    }
+
+    public Integer getSTATICCount()
+    {
+        return kindCounts.get(Kind.STATIC);
+    }
+    public Integer getFIELDCount()
+    {
+        return kindCounts.get(Kind.FIELD);
+    }
+    public Integer getARGCount()
+    {
+        return kindCounts.get(Kind.ARG);
+    }
+    public Integer getVARCount()
+    {
+        return kindCounts.get(Kind.VAR);
     }
 
 }

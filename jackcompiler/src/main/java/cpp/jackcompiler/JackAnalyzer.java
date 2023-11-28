@@ -28,7 +28,7 @@ public class JackAnalyzer
                 if( !file.getPath().substring(lastDot).contains("jack") )
                     continue;
 
-                File output = new File( file.getPath().concat(".vm"));
+                File output = new File( file.getPath().substring(0,lastDot).concat(".xml"));
                 if(output.exists())
                 {
                     in = new Scanner(System.in);
@@ -61,7 +61,7 @@ public class JackAnalyzer
                 return;
             }
 
-            File output = new File( inputFile.getPath().concat(".vm"));
+            File output = new File( inputFile.getPath().substring(0,lastDot).concat(".xml") );
             if(output.exists())
             {
                 in = new Scanner(System.in);

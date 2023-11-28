@@ -12,18 +12,33 @@ public class CompilationEngine
     private FileWriter writer;
 
     private SymbolTable symTable;
-
+    private VMWriter vmWriter;
 
     private String className;
+
+    private long ifIndex;
+    private long whileIndex;
+
 
     //In file should be confirm as .jack outisde of engine. outfile should also be assured to not exist.
     public CompilationEngine(File inFile)
     {
         indentationCount = 0;
+        ifIndex = 0;
+        whileIndex = 0;
         tokenizer = new JackTokenizer(inFile);
-        File outFile = new File( inFile.getPath().concat(".vm") ); // Filepath[.jack]->Filepath[.vm]
+
+        int lastDot = inFile.getPath().lastIndexOf('.');
+        File outFile = new File( inFile.getPath().substring(0,lastDot).concat(".xml") ); // Filepath[.jack]->Filepath[.xml]
+        File vmOutFile = new File( inFile.getPath().substring(0,lastDot).concat(".vm") ); // Filepath[.jack]->Filepath[.xml]
+        vmWriter = new VMWriter(vmOutFile);
+
         try 
         {
+            if(vmOutFile.exists())
+                vmOutFile.delete();
+            vmWriter = new VMWriter(vmOutFile);
+            
             outFile.createNewFile();
             writer = new FileWriter(outFile);
         } 
@@ -31,8 +46,8 @@ public class CompilationEngine
         {
             e.printStackTrace();
         }       
-        
         symTable = new SymbolTable();
+
     }
 
     public void closeWriter()
@@ -40,6 +55,7 @@ public class CompilationEngine
         try 
         {
             writer.close();
+            vmWriter.closeVMWriter();
         } 
         catch (IOException e) 
         {
@@ -151,9 +167,12 @@ public class CompilationEngine
         openTagAndIncrementIndent("<Subroutine>");
 
         symTable.StartSubroutine();
-        symTable.Define("this", className, Kind.ARG);
-
+        
+        String subType = tokenizer.keyword();
         writeKeyword(); // Constructor Function Method
+
+        if(subType.equals("method"))
+            symTable.Define("this", className, Kind.ARG);
 
         compileType(true, "SUB_ROUTINE", "sub_route");
         
@@ -162,6 +181,7 @@ public class CompilationEngine
             tokenizer.printError("Class Subroutine - Identifier","No more tokens for CLASS_SUB_ROUTE.");
         if(tokenizer.tokenType() != TokenType.IDENTIFIER)
             tokenizer.printError("Class Subroutine - Identifier","Subroutine Name Missing");
+        String subId =tokenizer.identifier();
         writeIdentifier();
 
         if(!tokenizer.ifTokensAdvance())
@@ -187,6 +207,32 @@ public class CompilationEngine
         
         if(tokenizer.tokenType() == TokenType.KEYWORD)
             compileVarDec();
+
+        //VM
+        switch (subType) 
+        {
+            case "constructor":
+                vmWriter.writeFunction( className.concat(".new"), symTable.getVARCount());
+                vmWriter.writePush(Segment.CONST, symTable.getFIELDCount());
+                vmWriter.writeCall("Memory.alloc", 1);
+                vmWriter.writePush(Segment.POINTER, 0);
+                break;
+
+            case "function":
+                vmWriter.writeFunction(className.concat(".").concat(subId), symTable.getVARCount());
+                break;
+
+            case "method":
+                vmWriter.writeFunction(className.concat(".").concat(subId), symTable.getVARCount());
+                vmWriter.writePush(Segment.ARG, 0);
+                vmWriter.writePop(Segment.POINTER, 0);
+                break;
+        
+            default:
+                break;
+        }
+        //
+
         if(tokenizer.tokenType() == TokenType.KEYWORD)
             compileStatements();
 
@@ -371,6 +417,8 @@ public class CompilationEngine
             tokenizer.printError("Statement Do - Call Identifier","do statement subroutine/var/class name missing");
         compileSubroutineCall();
 
+        vmWriter.writePop(Segment.TEMP, 0);
+
         if(tokenizer.tokenType() != TokenType.SYMBOL)
             tokenizer.printError("Statement Do - Symbol","do statement closer missing.");
         writeSymbol(); // ;
@@ -388,6 +436,10 @@ public class CompilationEngine
             tokenizer.printError("Statement Let- Identifier","No more tokens for LET_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.IDENTIFIER)
             tokenizer.printError("Statement Let- Identifier","let statement variable name Missing");
+        String var = tokenizer.identifier();
+        Kind knd = symTable.KindOf(var);
+        int index = symTable.IndexOf(var);
+        boolean arrayAccess = false;
         writeIdentifier(); // varName
 
         if(!tokenizer.ifTokensAdvance())
@@ -395,9 +447,11 @@ public class CompilationEngine
         if(tokenizer.tokenType() != TokenType.SYMBOL)
             tokenizer.printError("Statement Let- Symbol","let statement invalid end");
         writeSymbol(); // '=' or '['
-
+        
         if(tokenizer.symbol() == '[')
         {
+            arrayAccess = true;
+
             if(!tokenizer.ifTokensAdvance())
                 tokenizer.printError("Statement Let Array- Expression","No more tokens for LET_STATEMENT.");
             TokenType type = tokenizer.tokenType();
@@ -406,6 +460,10 @@ public class CompilationEngine
             compileExpression(); // WIP
             
             writeSymbol(); // ']'
+            
+            vmWriter.writePush(kindToSegment(knd), index);
+            vmWriter.writeArithmetic('+');
+            vmWriter.writePop(Segment.TEMP, 0);
 
             if(!tokenizer.ifTokensAdvance())
                 tokenizer.printError("Statement Let Array- Symbol","No more tokens for LET_STATEMENT.");
@@ -421,6 +479,17 @@ public class CompilationEngine
             tokenizer.printError("Statement Let - Expression","let statement invalid end");
         compileExpression(); //WIP
 
+        if(arrayAccess)
+        {
+            vmWriter.writePush(Segment.TEMP, 0);
+            vmWriter.writePop(Segment.POINTER, 1);
+            vmWriter.writePop(Segment.THAT, 0);
+        }
+        else
+        {
+            vmWriter.writePop(kindToSegment(knd), index);
+        }
+
         if(tokenizer.tokenType() != TokenType.SYMBOL)
             tokenizer.printError("Statement Let - Symbol","let statement missing closer. ';' missing. ");
         writeSymbol(); // ;
@@ -432,39 +501,43 @@ public class CompilationEngine
     {
         openTagAndIncrementIndent("<whileStatement>");
 
-        writeKeyword(); // While
+        long ActiveIndex = whileIndex++;
+        vmWriter.writeLabel("WHILE_".concat(String.valueOf(ActiveIndex)));
 
+        writeKeyword(); // While
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Statement While - Open Parenthesis","No more tokens for LET_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='(')
             tokenizer.printError("Statement While - Open Parenthesis","while statement missing condition parenthesis");
         writeSymbol(); // (
-
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Statement While - Expression","No more tokens for LET_STATEMENT.");
         TokenType type = tokenizer.tokenType();
         if(type != TokenType.KEYWORD && type != TokenType.IDENTIFIER && type != TokenType.INT_CONST && type != TokenType.STRING_CONST)
             tokenizer.printError("Statement While - Expression","let statement invalid end");
         compileExpression(); //WIP
-
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !=')')
             tokenizer.printError("Statement While - Close Parenthesis","while statement missing condition parenthesis");
         writeSymbol(); // )
+
+        vmWriter.writeArithmetic('$'); //NOT
+        vmWriter.writeIf("WHILE_END_".concat(String.valueOf(ActiveIndex))); //GOTO END IF WHILE IS NOT FUFILLED
 
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Statement While - Open Bracket","No more tokens for LET_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='{')
             tokenizer.printError("Statement While - Open Bracket","while statement missing body brace");
         writeSymbol(); // {
-
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Statement While - Keyword","No more tokens for CLASS_SUB_ROUTE.");
         if(tokenizer.tokenType() == TokenType.KEYWORD)
             compileStatements();
-
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='}')
             tokenizer.printError("Statement While - Symbol","while statement missing body brace");
         writeSymbol(); // }
+
+        vmWriter.writeGoto("WHILE_".concat(String.valueOf(ActiveIndex))); //Return TO While Check
+        vmWriter.writeLabel("WHILE_END_".concat(String.valueOf(ActiveIndex)));
 
         closeTagAndDecrementIndent("</whileStatement>");
     }
@@ -487,7 +560,13 @@ public class CompilationEngine
         {
             compileExpression(); //WIP
         }
+        else
+        {
+            vmWriter.writePush(Segment.CONST, 0);
+        }
         
+        vmWriter.writeReturn();
+
         if( (tokenizer.tokenType() == TokenType.SYMBOL) && ( tokenizer.symbol() == ';' ) )
             writeSymbol();
         else
@@ -508,39 +587,47 @@ public class CompilationEngine
         indentationCount++;
         writeLine(sb.toString());
 
+        long ActiveIndex = ifIndex++;
+        
         writeKeyword(); // IF
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Statement If - Open Parenthesis","No more tokens for IF_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='(')
             tokenizer.printError("Statement If - Open Parenthesis","while statement missing condition parenthesis");
         writeSymbol(); // (
-
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Statement If - Expressions","No more tokens for IF_STATEMENT.");
         compileExpression(); //WIP
-
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !=')')
             tokenizer.printError("Statement If - Close Parenthesis","while statement missing condition parenthesis");
         writeSymbol(); // )
+
+        //VM
+        vmWriter.writeIf("IF_TRUE_".concat(String.valueOf(ActiveIndex)));
+        vmWriter.writeGoto("IF_FALSE_".concat(String.valueOf(ActiveIndex))); //Skiped Over If True
+        vmWriter.writeLabel("IF_TRUE_".concat(String.valueOf(ActiveIndex)));
+        //
 
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Statement If - Open Bracket","No more tokens for IF_STATEMENT.");
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='{')
             tokenizer.printError("Statement If - Open Bracket","while statement missing body brace");
         writeSymbol(); // {
-
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Statement If - Statements","No more tokens for IF_STATEMENT.");
         if(tokenizer.tokenType() == TokenType.KEYWORD)
             compileStatements(); //WIP
-
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='}')
             tokenizer.printError("Statement If - CloseBracket","while statement missing body brace");
         writeSymbol(); // }
+        
+        //VM
+        vmWriter.writeGoto("IF_END_".concat(String.valueOf(ActiveIndex))); // Skip Else Statement
+        vmWriter.writeLabel("IF_FALSE_".concat(String.valueOf(ActiveIndex))); // Will Be Joined With IF_END if no else block exists
+        //
 
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Statement If - END","No more tokens for IF_STATEMENT.");
-        
         if(tokenizer.tokenType() == TokenType.KEYWORD && tokenizer.keyword().equals("else"))
         {
             writeKeyword(); // ELSE
@@ -563,6 +650,8 @@ public class CompilationEngine
                 tokenizer.printError("Statement If - END","No more tokens for IF_STATEMENT.");
         }
 
+        vmWriter.writeLabel("IF_END_".concat(String.valueOf(ActiveIndex)));
+
         sb = new StringBuilder();
         indentationCount--;
         sb.append("\t".repeat(indentationCount));
@@ -572,6 +661,13 @@ public class CompilationEngine
 
     private void compileSubroutineCall()
     { 
+        String function = "";
+        String id = tokenizer.identifier();
+        String type = symTable.TypeOf(id);
+        Kind knd = symTable.KindOf(id);
+        Integer index = symTable.IndexOf(id);
+        int agrsCount = 0;
+
         writeIdentifier(); //Name
 
         if(!tokenizer.ifTokensAdvance())
@@ -586,6 +682,21 @@ public class CompilationEngine
                 tokenizer.printError("Subroutine Call - Identifier","No more tokens for SUBROUTINECALL_STATEMENT.");
             if(tokenizer.tokenType() != TokenType.IDENTIFIER)
                 tokenizer.printError("Subroutine Call - Identifier","sub routine name is missing error");
+            
+            //VM
+            if(type != null)
+            {
+                agrsCount += 1;
+                vmWriter.writePush(kindToSegment(knd), index);
+                function = type;
+            }
+            else
+            {
+                function = id;
+            }
+            function = function.concat(".").concat(tokenizer.identifier());
+            //
+
             writeIdentifier(); // NAME
 
             if(!tokenizer.ifTokensAdvance())
@@ -594,25 +705,43 @@ public class CompilationEngine
                 tokenizer.printError("Subroutine Call - Symbol","sub missing condition parenthesis");
             writeSymbol(); //(
         }
+        else
+        {
+            agrsCount++;
+            vmWriter.writePush(Segment.POINTER, 0);
+        }
 
-        compileExpressionList();
+        agrsCount += compileExpressionList();
+
+        if(function.isEmpty())
+        {
+            vmWriter.writeCall(className.concat(".").concat(id), agrsCount);
+        }
+        else
+        {
+            vmWriter.writeCall(function, agrsCount);
+        }
 
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !=')')
             tokenizer.printError("Subroutine Call - Close Parenthesis","sub routine missing condition parenthesis");
         writeSymbol(); // )
-
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Subroutine Call - END","No more tokens for SUBROUTINECALL_STATEMENT.");
     }
 
     public void compileExpression()
     {
+        boolean empty = true;
         openTagAndIncrementIndent("<expression>");
 
         compileTerm();
 
         while(tokenizer.tokenType() == TokenType.SYMBOL && isOP(tokenizer.symbol()) )
         {
+            //VM
+            vmWriter.writeArithmetic(tokenizer.symbol());
+            //
+
             writeSymbol();
 
             if(!tokenizer.ifTokensAdvance())
@@ -636,11 +765,27 @@ public class CompilationEngine
                 TermIdentifierChecks();
                 break;
             case INT_CONST: 
+                //VM
+                vmWriter.writePush(Segment.CONST, tokenizer.intVal());
+                //
                 writeIntegerConst();
                 if(!tokenizer.ifTokensAdvance())
                     tokenizer.printError("Term - END","No more tokens for TERM.");
                 break;
             case STRING_CONST:
+                //VM
+                String str = tokenizer.stringVal();
+                int start = str.indexOf('"');
+                int last = str.lastIndexOf('"');
+                str = str.substring( start+1 , last);
+                vmWriter.writePush(Segment.CONST, str.length());
+                vmWriter.writeCall("String.new", 1);
+                for (int i=0; i<str.length(); i++) 
+                {
+                    vmWriter.writePush(Segment.CONST,str.codePointAt(i) );
+                    vmWriter.writeCall("String.appendChar", 2); 
+                }
+                //
                 writeStringConst();
                 if(!tokenizer.ifTokensAdvance())
                 tokenizer.printError("Term - END","No more tokens for TERM.");
@@ -648,6 +793,25 @@ public class CompilationEngine
             case KEYWORD:    
                 if( !tokenizer.keyword().equals("true") &&  !tokenizer.keyword().equals("false") &&  !tokenizer.keyword().equals("null") && !tokenizer.keyword().equals("this"))
                     tokenizer.printError("Term - Keyword","not a keyword constant");    
+                
+                switch (tokenizer.keyword()) {
+                    case "null":
+                    case "false":
+                        vmWriter.writePush(Segment.CONST, 0);
+                        break;
+                    
+                    case "true":
+                        vmWriter.writePush(Segment.CONST, 1);
+                        vmWriter.writeArithmetic('$');
+                        break;
+
+                    case "this":
+                        vmWriter.writePush(Segment.POINTER, 0);
+                        break;
+                    default:
+                        break;
+                }
+
                 writeKeyword();
                 if(!tokenizer.ifTokensAdvance())
                     tokenizer.printError("Term - END","No more tokens for TERM.");
@@ -669,22 +833,32 @@ public class CompilationEngine
             //Expresion Term
             case '(':
                 writeSymbol();
+
                 compileExpression();
+
                 if(tokenizer.symbol() == ')')
                     writeSymbol();
                 else
                     tokenizer.printError("Term - Closing Parenthesis","not a term token");
-
                 break;
             //Unary Ops
             case '-':
+                if(!tokenizer.ifTokensAdvance())
+                    tokenizer.printError("'term sym","No more tokens for term.");
+                compileTerm();
+                writeSymbol();
+                //VM
+                vmWriter.writeArithmetic('$');
+                //
+                break;
             case '~':
                 writeSymbol();
                 if(!tokenizer.ifTokensAdvance())
-                {
-                    //ERROR
-                }
+                    tokenizer.printError("'term sym","No more tokens for term.");
                 compileTerm();
+                //VM
+                vmWriter.writeArithmetic('~');
+                //
                 break;
         
             default: // pass check up
@@ -693,44 +867,75 @@ public class CompilationEngine
 
     private void TermIdentifierChecks()
     {
-        writeIdentifier();
+        //VM
+        int agrsCount = -1;
+        String id = tokenizer.identifier();
+        String type = symTable.TypeOf( id );
+        int index = symTable.IndexOf( id );
+        Kind knd = symTable.KindOf( id );
+        String modifiers = "<" + type + "/>" + "<" + index + "/>" + "<" + knd + "/>"  ;
+        //
+        writeIdentifier(modifiers);
 
         if(!tokenizer.ifTokensAdvance())
-        {
-        }
-
+            tokenizer.printError("Term - Identifier","No more tokens for TERM.");
         if(tokenizer.tokenType() != TokenType.SYMBOL)
         {
+            //VM
+            vmWriter.writePush(kindToSegment(knd), index);
+            //
             return;
         }
-            
+        
         switch (tokenizer.symbol()) {
             case '[': // VARNAME[expressions]
                 writeSymbol();
+                //VM
+                    vmWriter.writePush(kindToSegment(knd), index);
+                //
                 if(!tokenizer.ifTokensAdvance())
-                {
-                    System.err.println("TERM ARRAY ACCESS FAILURE");
-                }
+                    tokenizer.printError("Term - Identifier Array","No more tokens for TERM.");
                 compileExpression();
-                writeSymbol();
+                //VM
+                    vmWriter.writeArithmetic('+');
+                    vmWriter.writePop(Segment.POINTER, 1);
+                    vmWriter.writePush(Segment.THAT, 0);
+                //
+                writeSymbol(); // ]
                 break;
 
             case '(': //Subroutine Call
                 writeSymbol();
+                
+                //VM
+                agrsCount = 1;
+                vmWriter.writePush(Segment.POINTER, 0);
+                //
+
                 if(!tokenizer.ifTokensAdvance())
-                {
-                    //missing expressions and ')'
-                }
-                compileExpressionList();
+                    tokenizer.printError("Term - Identifier Subroutine Call","No more tokens for TERM.");
+                //VM
+                agrsCount += compileExpressionList();
+                vmWriter.writeCall(className.concat(id), agrsCount);
+                //
+
                 writeSymbol();
                 break;
 
             case '.': //Subroutine Call
                 writeSymbol();
+                agrsCount = 0;
+                if(type != null)
+                {
+                    agrsCount++;
+                    vmWriter.writePush(kindToSegment(knd), index);
+                }
+
                 if(!tokenizer.ifTokensAdvance())
                     tokenizer.printError("Term - Identifier","No more tokens for TERM.");
                 if(tokenizer.tokenType() != TokenType.IDENTIFIER)
                     tokenizer.printError("Term - Identifier","subroutine name missing.");
+                String subName = tokenizer.identifier();
                 writeIdentifier();
 
                 if(!tokenizer.ifTokensAdvance())
@@ -738,11 +943,24 @@ public class CompilationEngine
                 if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !='(')
                     tokenizer.printError("Term - Symbol","sub missing condition parenthesis");
                 writeSymbol();
-                compileExpressionList();
+
+                agrsCount += compileExpressionList();
                 
+                //  VM
+                if(type != null)
+                {
+                    vmWriter.writeCall(type.concat(subName), agrsCount); // Type.SubName
+                }
+                else
+                {   
+                    vmWriter.writeCall(id.concat(subName), agrsCount); // Class.SubName
+                }
+                //
+
                 if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !=')')
                     tokenizer.printError("Term - Symbol","sub routine missing condition parenthesis");
                 writeSymbol();
+
                 break;
             default:
                 return;
@@ -770,34 +988,40 @@ public class CompilationEngine
         }
     }
 
-    private void compileExpressionList()
+    private int compileExpressionList()
     {
+        int count = 0;
         openTagAndIncrementIndent("<expressionList>");
 
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("ExpressionList - Type","No more tokens for EXPRESSION_LIST.");
-        TokenType type = tokenizer.tokenType();
-        if(type == TokenType.KEYWORD || type == TokenType.IDENTIFIER || type == TokenType.INT_CONST || type == TokenType.STRING_CONST || type == TokenType.SYMBOL )
-        {
-            compileExpression();
+        
+        if(tokenizer.tokenType() == TokenType.SYMBOL && (tokenizer.symbol() == ')') ) 
+            count--;
 
-            if(tokenizer.tokenType() == TokenType.SYMBOL)
-                while (tokenizer.symbol() == ',') 
-                {
-                    writeSymbol(); // ,
-                    
-                    if(!tokenizer.ifTokensAdvance())
-                        tokenizer.printError("ExpressionList - Expression","No more tokens for EXPRESSION_LIST.");
-                    if(type != TokenType.KEYWORD && type != TokenType.IDENTIFIER && type != TokenType.INT_CONST && type != TokenType.STRING_CONST && type == TokenType.SYMBOL)
-                        tokenizer.printError("ExpressionList - Expression","expresion list, opened list.");
-                    compileExpression();
+        compileExpression();
+        count++;
 
-                    if(tokenizer.tokenType() != TokenType.SYMBOL)
-                        break;
-                }
-        }
+        TokenType type = TokenType.UNSET;
+        if(tokenizer.tokenType() == TokenType.SYMBOL)
+            while (tokenizer.symbol() == ',') 
+            {
+                writeSymbol(); // ,
+                count++;
+                
+                if(!tokenizer.ifTokensAdvance())
+                    tokenizer.printError("ExpressionList - Expression","No more tokens for EXPRESSION_LIST.");
+                if(type != TokenType.KEYWORD && type != TokenType.IDENTIFIER && type != TokenType.INT_CONST && type != TokenType.STRING_CONST && type == TokenType.SYMBOL)
+                    tokenizer.printError("ExpressionList - Expression","expresion list, opened list.");
+                compileExpression();
+
+                if(tokenizer.tokenType() != TokenType.SYMBOL)
+                    break;
+            }
+        
         
         closeTagAndDecrementIndent("</expressionList>");
+        return count;
     }
 
     private String compileType(boolean addVoid, String caller, String typeFor)
@@ -851,14 +1075,32 @@ public class CompilationEngine
         writeLine(sb.toString());
     }
 
+    private void writeIdentifier(String mods)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\t".repeat(indentationCount));
+        sb.append("<identifier>\n");
+
+        sb.append("\t".repeat(indentationCount+1));
+        sb.append(""+mods+"\n");
+
+        sb.append("\t".repeat(indentationCount+2));
+        sb.append(tokenizer.identifier() + "\n");
+
+        sb.append("\t".repeat(indentationCount+1));
+        sb.append(""+mods+"\n");
+
+        sb.append("\t".repeat(indentationCount));
+        sb.append(" </identifier>");
+        writeLine(sb.toString());
+    }
+
     private void writeIdentifier()
     {
         StringBuilder sb = new StringBuilder();
         sb.append("\t".repeat(indentationCount));
         sb.append("<identifier> ");
-
         sb.append(tokenizer.identifier());
-
         sb.append(" </identifier>");
         writeLine(sb.toString());
     }
@@ -913,6 +1155,24 @@ public class CompilationEngine
         sb.append("\t".repeat(indentationCount));
         sb.append(tag);
         writeLine(sb.toString());
+    }
+
+    private Segment kindToSegment(Kind knd)
+    {
+        switch (knd) {
+            case ARG:
+                return Segment.ARG;
+            case FIELD:
+                return Segment.THIS;//
+            case STATIC:
+                return Segment.TEMP;
+            case VAR:
+                return Segment.LOCAL;
+
+            case NULL:
+                break;
+        }
+        return null;
     }
 
 }

@@ -1,0 +1,91 @@
+<class>
+	<keyword>class</keyword>
+	<identifier> SquareGame </identifier>
+	<symbol> { </symbol>
+	<ClassVarDec>
+		<keyword>field</keyword>
+		<identifier> Square </identifier>
+		<identifier> square </identifier>
+		<symbol> ; </symbol>
+	</ClassVarDec>
+	<ClassVarDec>
+		<keyword>field</keyword>
+		<keyword>int</keyword>
+		<identifier> direction </identifier>
+		<symbol> ; </symbol>
+	</ClassVarDec>
+	<Subroutine>
+		<keyword>constructor</keyword>
+		<identifier> SquareGame </identifier>
+		<identifier> new </identifier>
+		<symbol> ( </symbol>
+		<parameterList>
+		</parameterList>
+		<symbol> ) </symbol>
+		<symbol> { </symbol>
+		<varDec>
+		</varDec>
+		<Statements>
+			<letStatement>
+				<keyword>let</keyword>
+				<identifier> square </identifier>
+				<symbol> = </symbol>
+				<expression>
+					<term>
+						<identifier>
+							<null/><-1/><NULL/>
+								Square
+							<null/><-1/><NULL/>
+						 </identifier>
+						<symbol> . </symbol>
+						<identifier> new </identifier>
+						<symbol> ( </symbol>
+						<expressionList>
+							<expression>
+								<term>
+									<integerConstant> 0 </integerConstant>
+								</term>
+							</expression>
+							<symbol> , </symbol>
+							<expression>
+								<term>
+									<integerConstant> 0 </integerConstant>
+								</term>
+							</expression>
+							<symbol> , </symbol>
+							<expression>
+								<term>
+									<integerConstant> 30 </integerConstant>
+								</term>
+							</expression>
+						</expressionList>
+						<symbol> ) </symbol>
+					</term>
+				</expression>
+				<symbol> ; </symbol>
+			</letStatement>
+			<letStatement>
+				<keyword>let</keyword>
+				<identifier> direction </identifier>
+				<symbol> = </symbol>
+				<expression>
+					<term>
+						<integerConstant> 0 </integerConstant>
+					</term>
+				</expression>
+				<symbol> ; </symbol>
+			</letStatement>
+			<returnStatement>
+				<keyword>return</keyword>
+				<expression>
+					<term>
+						<keyword>this</keyword>
+					</term>
+				</expression>
+				<symbol> ; </symbol>
+			</returnStatement>
+		</Statements>
+		<symbol> } </symbol>
+	</Subroutine>
+	<symbol> } </symbol>
+</class>
