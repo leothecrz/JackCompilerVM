@@ -86,5 +86,191 @@
 		</Statements>
 		<symbol> } </symbol>
 	</Subroutine>
+	<Subroutine>
+		<keyword>function</keyword>
+		<keyword>void</keyword>
+		<identifier> more </identifier>
+		<symbol> ( </symbol>
+		<parameterList>
+		</parameterList>
+		<symbol> ) </symbol>
+		<symbol> { </symbol>
+		<varDec>
+			<keyword>var</keyword>
+			<keyword>int</keyword>
+			<identifier> i </identifier>
+			<symbol> , </symbol>
+			<identifier> j </identifier>
+			<symbol> ; </symbol>
+			<keyword>var</keyword>
+			<identifier> String </identifier>
+			<identifier> s </identifier>
+			<symbol> ; </symbol>
+			<keyword>var</keyword>
+			<identifier> Array </identifier>
+			<identifier> a </identifier>
+			<symbol> ; </symbol>
+		</varDec>
+		<Statements>
+			<ifStatement>
+				<keyword>if</keyword>
+				<symbol> ( </symbol>
+				<expression>
+					<term>
+						<keyword>false</keyword>
+					</term>
+				</expression>
+				<symbol> ) </symbol>
+				<symbol> { </symbol>
+				<Statements>
+					<letStatement>
+						<keyword>let</keyword>
+						<identifier> s </identifier>
+						<symbol> = </symbol>
+						<expression>
+							<term>
+								<stringConstant> "string constant" </stringConstant>
+							</term>
+						</expression>
+						<symbol> ; </symbol>
+					</letStatement>
+					<letStatement>
+						<keyword>let</keyword>
+						<identifier> s </identifier>
+						<symbol> = </symbol>
+						<expression>
+							<term>
+								<keyword>null</keyword>
+							</term>
+						</expression>
+						<symbol> ; </symbol>
+					</letStatement>
+					<letStatement>
+						<keyword>let</keyword>
+						<identifier> a </identifier>
+						<symbol> [ </symbol>
+						<expression>
+							<term>
+								<integerConstant> 1 </integerConstant>
+							</term>
+						</expression>
+						<symbol> ] </symbol>
+						<symbol> = </symbol>
+						<expression>
+							<term>
+								<identifier>
+									<Array/><3/><VAR/>
+										a
+									<Array/><3/><VAR/>
+								 </identifier>
+								<symbol> [ </symbol>
+								<expression>
+									<term>
+										<integerConstant> 2 </integerConstant>
+									</term>
+								</expression>
+								<symbol> ] </symbol>
+							</term>
+						</expression>
+						<symbol> ; </symbol>
+					</letStatement>
+				</Statements>
+				<symbol> } </symbol>
+				<keyword>else</keyword>
+				<symbol> { </symbol>
+				<Statements>
+					<letStatement>
+						<keyword>let</keyword>
+						<identifier> i </identifier>
+						<symbol> = </symbol>
+						<expression>
+							<term>
+								<identifier>
+									<int/><0/><VAR/>
+										i
+									<int/><0/><VAR/>
+								 </identifier>
+							</term>
+							<symbol> * </symbol>
+							<term>
+								<symbol> ( </symbol>
+								<expression>
+									<term>
+										<symbol> - </symbol>
+										<term>
+											<identifier>
+												<int/><1/><VAR/>
+													j
+												<int/><1/><VAR/>
+											 </identifier>
+										</term>
+									</term>
+								</expression>
+								<symbol> ) </symbol>
+							</term>
+						</expression>
+						<symbol> ; </symbol>
+					</letStatement>
+					<letStatement>
+						<keyword>let</keyword>
+						<identifier> j </identifier>
+						<symbol> = </symbol>
+						<expression>
+							<term>
+								<identifier>
+									<int/><1/><VAR/>
+										j
+									<int/><1/><VAR/>
+								 </identifier>
+							</term>
+							<symbol> / </symbol>
+							<term>
+								<symbol> ( </symbol>
+								<expression>
+									<term>
+										<symbol> - </symbol>
+										<term>
+											<integerConstant> 2 </integerConstant>
+										</term>
+									</term>
+								</expression>
+								<symbol> ) </symbol>
+							</term>
+						</expression>
+						<symbol> ; </symbol>
+					</letStatement>
+					<letStatement>
+						<keyword>let</keyword>
+						<identifier> i </identifier>
+						<symbol> = </symbol>
+						<expression>
+							<term>
+								<identifier>
+									<int/><0/><VAR/>
+										i
+									<int/><0/><VAR/>
+								 </identifier>
+							</term>
+							<symbol> | </symbol>
+							<term>
+								<identifier>
+									<int/><1/><VAR/>
+										j
+									<int/><1/><VAR/>
+								 </identifier>
+							</term>
+						</expression>
+						<symbol> ; </symbol>
+					</letStatement>
+				</Statements>
+				<symbol> } </symbol>
+			</ifStatement>
+			<returnStatement>
+				<keyword>return</keyword>
+				<symbol> ; </symbol>
+			</returnStatement>
+		</Statements>
+		<symbol> } </symbol>
+	</Subroutine>
 	<symbol> } </symbol>
 </class>

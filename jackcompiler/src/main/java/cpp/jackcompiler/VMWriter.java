@@ -122,10 +122,10 @@ public class VMWriter
                 break;
 
             //Unary operators
-            case '~':
+            case '$':
                 sb.append("neg");
                 break;
-            case '$':
+            case '~':
                 sb.append("not");
                 break;
             default:

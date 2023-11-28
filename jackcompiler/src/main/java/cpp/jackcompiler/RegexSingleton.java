@@ -20,7 +20,7 @@ public class RegexSingleton
         identifier = Pattern.compile("^\\s*([a-zA-Z_][a-zA-Z0-9_]*)"); // Starts with letter
         stringPattern = Pattern.compile("^\\s*\"(.)*\""); // Quoted
         intPattern = Pattern.compile("^\\s*\\d+"); //Digit
-        comments = Pattern.compile("((?:\\/\\*\\*|\\/\\*|\\*).*?(?:$|\\*\\/))|(\\/\\/.*)");
+        comments = Pattern.compile("(?:^(?:\\/\\*\\*?)(.*)(?:\\*\\/?))|(?:^\\*(.*)\\*\\/?)|(?:^\\/\\/(.*))");
         whitespace = Pattern.compile("\\s+");
     }
     public static RegexSingleton getInstance() 

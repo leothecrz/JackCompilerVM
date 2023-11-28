@@ -239,7 +239,10 @@ public class CompilationEngine
         if(tokenizer.tokenType() != TokenType.SYMBOL && tokenizer.symbol() == '}')
             tokenizer.printError("Class Subroutine - Closing Bracket","SUB ROUTINE Closing parenthesis missing.");
         writeSymbol(); // }
-        
+
+        if(!tokenizer.ifTokensAdvance())
+            tokenizer.printError("Class Subroutine - VarDec/Statemests","No more tokens for CLASS_SUB_ROUTE.");
+    
         closeTagAndDecrementIndent("</Subroutine>");
     }
 
@@ -373,10 +376,12 @@ public class CompilationEngine
 
     public void compileStatements()
     {
+        
         openTagAndIncrementIndent("<Statements>");
 
         while (tokenizer.tokenType() == TokenType.KEYWORD) 
         {
+            boolean isIf = false;
             switch (tokenizer.keyword()) 
             {
                 case "let":
@@ -384,6 +389,7 @@ public class CompilationEngine
                     break;
                 case "if":
                     compileIf();
+                    isIf = true;
                     break;
                 case "while":
                     compileWhile();
@@ -398,7 +404,7 @@ public class CompilationEngine
                     tokenizer.printError("Statement - Start","Invalid Statement Start");
             }
 
-            if(!tokenizer.ifTokensAdvance())
+            if(!isIf && !tokenizer.ifTokensAdvance())
                 tokenizer.printError("Statement - Start","No more tokens for STATEMENTS.");
         }
 
@@ -463,7 +469,6 @@ public class CompilationEngine
             
             vmWriter.writePush(kindToSegment(knd), index);
             vmWriter.writeArithmetic('+');
-            vmWriter.writePop(Segment.TEMP, 0);
 
             if(!tokenizer.ifTokensAdvance())
                 tokenizer.printError("Statement Let Array- Symbol","No more tokens for LET_STATEMENT.");
@@ -481,8 +486,9 @@ public class CompilationEngine
 
         if(arrayAccess)
         {
-            vmWriter.writePush(Segment.TEMP, 0);
+            vmWriter.writePop(Segment.TEMP, 0);
             vmWriter.writePop(Segment.POINTER, 1);
+            vmWriter.writePush(Segment.TEMP, 0);
             vmWriter.writePop(Segment.THAT, 0);
         }
         else
@@ -512,15 +518,13 @@ public class CompilationEngine
         writeSymbol(); // (
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Statement While - Expression","No more tokens for LET_STATEMENT.");
-        TokenType type = tokenizer.tokenType();
-        if(type != TokenType.KEYWORD && type != TokenType.IDENTIFIER && type != TokenType.INT_CONST && type != TokenType.STRING_CONST)
-            tokenizer.printError("Statement While - Expression","let statement invalid end");
+        
         compileExpression(); //WIP
         if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() !=')')
             tokenizer.printError("Statement While - Close Parenthesis","while statement missing condition parenthesis");
         writeSymbol(); // )
 
-        vmWriter.writeArithmetic('$'); //NOT
+        vmWriter.writeArithmetic('~'); //NOT
         vmWriter.writeIf("WHILE_END_".concat(String.valueOf(ActiveIndex))); //GOTO END IF WHILE IS NOT FUFILLED
 
         if(!tokenizer.ifTokensAdvance())
@@ -731,25 +735,22 @@ public class CompilationEngine
 
     public void compileExpression()
     {
-        boolean empty = true;
         openTagAndIncrementIndent("<expression>");
 
         compileTerm();
 
         while(tokenizer.tokenType() == TokenType.SYMBOL && isOP(tokenizer.symbol()) )
         {
-            //VM
-            vmWriter.writeArithmetic(tokenizer.symbol());
-            //
-
+            char sym = tokenizer.symbol();
             writeSymbol();
 
             if(!tokenizer.ifTokensAdvance())
                 tokenizer.printError("Expression - Auxillarity Term","No more tokens for EXPRESSION.");
-            TokenType type = tokenizer.tokenType();
-            if(type != TokenType.KEYWORD && type != TokenType.IDENTIFIER && type != TokenType.INT_CONST && type != TokenType.STRING_CONST)
-                tokenizer.printError("Expression - Auxillarity Term","expression op requires term");
             compileTerm();
+            
+            //VM
+            vmWriter.writeArithmetic(sym);
+            //
         }
         
         closeTagAndDecrementIndent("</expression>");
@@ -833,20 +834,25 @@ public class CompilationEngine
             //Expresion Term
             case '(':
                 writeSymbol();
-
+                if(!tokenizer.ifTokensAdvance())
+                    tokenizer.printError("'term sym","No more tokens for term.");
                 compileExpression();
 
                 if(tokenizer.symbol() == ')')
+                {
                     writeSymbol();
+                    if(!tokenizer.ifTokensAdvance())
+                    tokenizer.printError("'term sym","No more tokens for term.");
+                }
                 else
                     tokenizer.printError("Term - Closing Parenthesis","not a term token");
                 break;
             //Unary Ops
             case '-':
+                writeSymbol();
                 if(!tokenizer.ifTokensAdvance())
                     tokenizer.printError("'term sym","No more tokens for term.");
                 compileTerm();
-                writeSymbol();
                 //VM
                 vmWriter.writeArithmetic('$');
                 //
@@ -860,7 +866,6 @@ public class CompilationEngine
                 vmWriter.writeArithmetic('~');
                 //
                 break;
-        
             default: // pass check up
         }
     }
@@ -890,13 +895,12 @@ public class CompilationEngine
         switch (tokenizer.symbol()) {
             case '[': // VARNAME[expressions]
                 writeSymbol();
-                //VM
-                    vmWriter.writePush(kindToSegment(knd), index);
-                //
+            
                 if(!tokenizer.ifTokensAdvance())
                     tokenizer.printError("Term - Identifier Array","No more tokens for TERM.");
                 compileExpression();
                 //VM
+                    vmWriter.writePush(kindToSegment(knd), index);
                     vmWriter.writeArithmetic('+');
                     vmWriter.writePop(Segment.POINTER, 1);
                     vmWriter.writePush(Segment.THAT, 0);
@@ -949,11 +953,11 @@ public class CompilationEngine
                 //  VM
                 if(type != null)
                 {
-                    vmWriter.writeCall(type.concat(subName), agrsCount); // Type.SubName
+                    vmWriter.writeCall(type.concat(".").concat(subName), agrsCount); // Type.SubName
                 }
                 else
                 {   
-                    vmWriter.writeCall(id.concat(subName), agrsCount); // Class.SubName
+                    vmWriter.writeCall(id.concat(".").concat(subName), agrsCount); // Class.SubName
                 }
                 //
 
@@ -963,6 +967,7 @@ public class CompilationEngine
 
                 break;
             default:
+                vmWriter.writePush(kindToSegment(knd), index);
                 return;
         }
         
