@@ -126,6 +126,7 @@ public class CompilationEngine
         writeIdentifier(); // VAR NAME
 
         Kind knd = key.equals("static") ? Kind.STATIC : Kind.FIELD;
+        
         symTable.Define(identifier, type, knd);
 
         if(!tokenizer.ifTokensAdvance())
@@ -215,7 +216,7 @@ public class CompilationEngine
                 vmWriter.writeFunction( className.concat(".new"), symTable.getVARCount());
                 vmWriter.writePush(Segment.CONST, symTable.getFIELDCount());
                 vmWriter.writeCall("Memory.alloc", 1);
-                vmWriter.writePush(Segment.POINTER, 0);
+                vmWriter.writePop(Segment.POINTER, 0);
                 break;
 
             case "function":
@@ -881,8 +882,10 @@ public class CompilationEngine
 
         if(!tokenizer.ifTokensAdvance())
             tokenizer.printError("Term - Identifier","No more tokens for TERM.");
-        if(tokenizer.tokenType() != TokenType.SYMBOL)
+        if(tokenizer.tokenType() != TokenType.SYMBOL || tokenizer.symbol() == ';')
         {
+
+            
             //VM
             vmWriter.writePush(kindToSegment(knd), index);
             //
@@ -1167,7 +1170,7 @@ public class CompilationEngine
             case FIELD:
                 return Segment.THIS;//
             case STATIC:
-                return Segment.TEMP;
+                return Segment.STATIC;
             case VAR:
                 return Segment.LOCAL;
 

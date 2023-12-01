@@ -31,8 +31,10 @@ public class JackAnalyzer
                 File output = new File( file.getPath().substring(0,lastDot).concat(".xml"));
                 if(output.exists())
                 {
+
+
                     in = new Scanner(System.in);
-                    System.out.println("Output file already exist. Replace it? (n/y)");
+                    System.out.println( "The Output file for:\n"+ file.getPath() +"\nalready exist. Replace it? (n/y)");
                     char charin = in.nextLine().trim().charAt(0);
                     if( charin != 'y' && charin != 'Y' )
                         System.exit(0);
@@ -48,6 +50,7 @@ public class JackAnalyzer
                 CompilationEngine CE = new CompilationEngine(file);
                 CE.compileClass();
                 CE.closeWriter();
+                System.out.println("Finished Compilling: " + file.getPath() );
             }
         }
         else
